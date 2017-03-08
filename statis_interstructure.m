@@ -1,4 +1,4 @@
-function [Co,S,SS,RV,W,VaP,VeP] = statis_interstructure (X,M,Delta,Sup,norm,D,varnames)
+function [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_interstructure (X,M,Delta,Sup,norm,D,varnames)
 %% Fonction de calcul de de l'interstructure pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
@@ -20,11 +20,12 @@ function [Co,S,SS,RV,W,VaP,VeP] = statis_interstructure (X,M,Delta,Sup,norm,D,va
 %      Delta
 % RV = Matrice avec les coefficients RV
 % W = Matrice avec les objets des t etudes
+% Wn = Matrice avec les objets des t etudes normes
 % VaP = Valeurs propres du matrice SS
 % VeP = Vecteurs propres du matrice SS
 %
 % Use:
-% [Co,S,SS,RV,W,VaP,VeP] = statis_interstructure (X,M,Delta,Sup,norm,D,varnames)
+% [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_interstructure (X,M,Delta,Sup,norm,D,varnames)
 %
 % Autor: Rodrigo Andres Rivera Martinez
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -62,6 +63,7 @@ end
 
 for i = 1:n
      W(:,:,i) = X(:,:,i)*M*X(:,:,i)';
+     Wn(:,:,i) = W(:,:,i)/norme(W(:,:,i));
 end
 %-------------------------------------------------------------------------------
 % Calcul de la matrice des produits scalaires S
