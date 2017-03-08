@@ -1,4 +1,4 @@
-function [Co,S,SS,RV] = statis_interstructure (X,M,Delta,Sup,norm,D,varnames)
+function [Co,S,SS,RV,W,VaP,VeP] = statis_interstructure (X,M,Delta,Sup,norm,D,varnames)
 %% Fonction de calcul de de l'interstructure pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
@@ -19,9 +19,12 @@ function [Co,S,SS,RV] = statis_interstructure (X,M,Delta,Sup,norm,D,varnames)
 % SS = Matrice des produits scalaire entre les tableaux afect? par le poids
 %      Delta
 % RV = Matrice avec les coefficients RV
+% W = Matrice avec les objets des t etudes
+% VaP = Valeurs propres du matrice SS
+% VeP = Vecteurs propres du matrice SS
 %
 % Use:
-% [Co,S,SS,RV] = statis_interstructure (X,M,Delta,Sup,norm,D,varnames)
+% [Co,S,SS,RV,W,VaP,VeP] = statis_interstructure (X,M,Delta,Sup,norm,D,varnames)
 %
 % Autor: Rodrigo Andres Rivera Martinez
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -105,7 +108,7 @@ end
 %-------------------------------------------------------------------------------
 SS = S*Delta;
 
-Cp = ACP(SS);
+[Cp,VaP,VeP] = ACP(SS);
 % Par le th?oreme de Frobenius on garde seulement les 2 premiers axes
 Co = Cp(:,1:2); 
 
@@ -143,7 +146,7 @@ end
 An= sqrt(prod_hs(A,A,D));
 end
 
-function [XU] = ACP(X)
+function [XU,VAPU, VEPU] = ACP(X)
 % Recherche des valeurs et vecteurs propres
 [VEPU, VAPU] = eig(X'*X);    
 VAPU         = diag(VAPU);        
