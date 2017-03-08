@@ -60,10 +60,15 @@ end
 %-------------------------------------------------------------------------------
 % Definition des objets
 %-------------------------------------------------------------------------------
+% Centrage des tableaux
 
 for i = 1:n
-     W(:,:,i) = X(:,:,i)*M*X(:,:,i)';
-     Wn(:,:,i) = W(:,:,i)/norme(W(:,:,i));
+    Xc(:,:,i) = centrer(X(:,:,i),mean(mean(X(:,:,i))), std(std(X(:,:,i))));
+end
+
+for i = 1:n
+     W(:,:,i) = Xc(:,:,i)*M*Xc(:,:,i)';
+     Wn(:,:,i) = W(:,:,i)/sqrt(norme(W(:,:,i)));
 end
 %-------------------------------------------------------------------------------
 % Calcul de la matrice des produits scalaires S
@@ -149,6 +154,9 @@ An= sqrt(prod_hs(A,A,D));
 end
 
 function [XU,VAPU, VEPU] = ACP(X)
+%--------------------------------
+% Calcul ACP
+%--------------------------------
 % Recherche des valeurs et vecteurs propres
 [VEPU, VAPU] = eig(X'*X);    
 VAPU         = diag(VAPU);        
@@ -160,4 +168,14 @@ VEPU     = VEPU(:,flipud(s));
 %
 % Nouvelles Coordonn?es (Composantes principales)
 XU = X * VEPU; 
+end
+
+function [Ac] = centrer(A,mean_A,std_A)
+%--------------------------------
+% Centrage des donn?es
+%--------------------------------
+UN = ones(size(A));
+Me = UN * mean_A;
+Ecart_type = UN * diag(std_A);
+Ac  = (A - Me)./Ecart_type;
 end
