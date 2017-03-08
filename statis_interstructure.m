@@ -40,7 +40,7 @@ end
 if L~=L3
     error('ERROR: Nb d''individus doit etre egal dans les matrices X et Sup');
 end
-if C ~= 3
+if C ~= C3
     error('ERROR: Nb de variables doit etre egal dans les matrices X et Sup');
 end
 
@@ -63,7 +63,7 @@ end
 %-------------------------------------------------------------------------------
 % Calcul de la matrice des produits scalaires S
 %-------------------------------------------------------------------------------
-if D
+if nargin == 6
     if ~norm
         for i=1:n
             for j=1:n
@@ -107,8 +107,9 @@ SS = S*Delta;
 
 Cp = ACP(SS);
 % Par le th?oreme de Frobenius on garde seulement les 2 premiers axes
-Co = Cp(:,1:2) 
+Co = Cp(:,1:2); 
 
+figure;
 scatter(Co(:,1),Co(:,2)); grid on; xlabel('Axe 1'); ylabel('Axe 2');
 title('Image euclidienne des objets')
 
@@ -124,7 +125,7 @@ function [r] = prod_hs(A,B,D)
 % Definition de produit scalaire
 %--------------------------------
 if nargin < 3
-    n= size(A,1);
+    n= size(A,2);
     D =1/n * eye(n);
 end
 r = trace(D*A*D*B);
@@ -135,7 +136,7 @@ function [An]= norme(A,D)
 % Definition de norme
 %--------------------------------
 if nargin < 3
-    n= size(A,1);
+    n= size(A,2);
     D =1/n * eye(n);
 end
 
