@@ -1,6 +1,9 @@
+# Méthode STATIS
+
 STATIS est une méthode exploratoire d’analyse des données utilisée pour les données quantitatives. [Escouffier et L’Hermier des Plantes, 1976]. Elle réalise l’exploration simultanée de plusieurs tableaux de données recueillis sur les mêmes individus. Le nombre de variables peut différer d’un tableau à un autre. On parle communément de T études <img src="https://rawgit.com/riverarodrigoa/statis-matlab/master/svgs/9d70300a0ba22e91623214ce670eb7a2.svg?invert_in_darkmode" align=middle width=132.836715pt height=24.56552999999997pt/>.
   Son but est la recherche d’une structure commune aux études, appelée infrastructure. Pour la mettre en place, il faut passer par les quatre étapes successives  suivantes :  
-\section{Étude de l’interstructure}
+
+## Étude de l’interstructure
   On y compare globalement les T tableaux de données. L'objet <img src="https://rawgit.com/riverarodrigoa/statis-matlab/master/svgs/dc92b47a36c3a7e426608cd76609eb7f.svg?invert_in_darkmode" align=middle width=20.414460000000002pt height=22.381919999999983pt/> est représentatif de l'étude (t) (<img src="https://rawgit.com/riverarodrigoa/statis-matlab/master/svgs/49184bdff4a09475b6ec9008f58a4fa7.svg?invert_in_darkmode" align=middle width=20.83521pt height=22.381919999999983pt/> est la métrique). L'objet est représenté par la formule suivante :
   <p align="center"><img src="https://rawgit.com/riverarodrigoa/statis-matlab/master/svgs/13bc30373fe575fb68ae3cf5c71ad8f1.svg?invert_in_darkmode" align=middle width=106.28194500000001pt height=13.656621pt/></p>
   Le produit scalaire de Hilbert-Schmidt est utilisé pour définir une distance entre objets <img src="https://rawgit.com/riverarodrigoa/statis-matlab/master/svgs/dc92b47a36c3a7e426608cd76609eb7f.svg?invert_in_darkmode" align=middle width=20.414460000000002pt height=22.381919999999983pt/>.
@@ -30,7 +33,7 @@ STATIS est une méthode exploratoire d’analyse des données utilisée pour les
   Comme dans l'ACP, si l'on ne veut pas que des tableaux interviennent dans la constitution de l'image euclidienne, on les ajoute comme tableaux supplémentaires.
 
 
-\section{Recherche d'un compromis}
+## Recherche d'un compromis
   Un compromis est une moyenne pondérée entre les objets <img src="https://rawgit.com/riverarodrigoa/statis-matlab/master/svgs/dc92b47a36c3a7e426608cd76609eb7f.svg?invert_in_darkmode" align=middle width=20.414460000000002pt height=22.381919999999983pt/>.
   <p align="center"><img src="https://rawgit.com/riverarodrigoa/statis-matlab/master/svgs/8729177f320ad960883f110540816016.svg?invert_in_darkmode" align=middle width=102.78246pt height=47.57808pt/></p>
   Les coefficients <img src="https://rawgit.com/riverarodrigoa/statis-matlab/master/svgs/9e2b8d7af10391275b0cbe00525e139f.svg?invert_in_darkmode" align=middle width=15.423705000000002pt height=14.102549999999994pt/> sont déterminés en respectant les deux critères suivants : 
@@ -43,7 +46,7 @@ STATIS est une méthode exploratoire d’analyse des données utilisée pour les
  <p align="center"><img src="https://rawgit.com/riverarodrigoa/statis-matlab/master/svgs/7d552aee519a72c2244aa05eb1e8e9b3.svg?invert_in_darkmode" align=middle width=314.3976pt height=49.131389999999996pt/></p>
   Dans l’image euclidienne des études, le compromis est situé sur le premier axe.
 
-\section{Étude de l’intrastructure}
+## Étude de l’intrastructure
   L’ACP du nuage d’individus fournit l’image euclidienne compromis.
   Soient <img src="https://rawgit.com/riverarodrigoa/statis-matlab/master/svgs/af4404577ab1384d1dfa9c1aa4b28b4c.svg?invert_in_darkmode" align=middle width=63.431115pt height=14.102549999999994pt/> les valeurs propres de la matrice WD associés aux vecteurs propres <img src="https://rawgit.com/riverarodrigoa/statis-matlab/master/svgs/12383b636426e58450221bf57a93face.svg?invert_in_darkmode" align=middle width=58.96902000000001pt height=14.102549999999994pt/>. L’image euclidienne compromis des individus est composée des points <img src="https://rawgit.com/riverarodrigoa/statis-matlab/master/svgs/8aa0fb30eec70c0bb108cbdb197f2c3a.svg?invert_in_darkmode" align=middle width=73.088565pt height=22.381919999999983pt/>; leurs coordonnées sur l’axe k sont les composantes du vecteur :
   <p align="center"><img src="https://rawgit.com/riverarodrigoa/statis-matlab/master/svgs/b66006268ddefdcfde71a63aade9626d.svg?invert_in_darkmode" align=middle width=146.99817pt height=38.430479999999996pt/></p>
@@ -54,7 +57,7 @@ STATIS est une méthode exploratoire d’analyse des données utilisée pour les
   <p align="center"><img src="https://rawgit.com/riverarodrigoa/statis-matlab/master/svgs/097921de3e0c74a3e4f291fb5c38592f.svg?invert_in_darkmode" align=middle width=195.89955pt height=21.96051pt/></p>
   Ces corrélations peuvent être résumés sur un graphique. L’étude de ce dernier est utile pour expliquer les positions compromis des individus dans leur image euclidienne.
 
-\section{Représentation des trajectoires des individus}
+## Représentation des trajectoires des individus
   Les trajectoires décrivent les écarts des objets entre eux et avec le compromis au niveau individuel. Leur représentation se fait dans l’image euclidienne compromis en même temps que les T nuages d’individus débouchant sur une représentation de nT points.
   Pour obtenir la trajectoire, on place les différentes positions d’un individu tel qu’il est décrit par chaque étude (t), on se base sur les coordonnées des points compromis <img src="https://rawgit.com/riverarodrigoa/statis-matlab/master/svgs/5470b087b677051953439a9bf6f36651.svg?invert_in_darkmode" align=middle width=68.53951500000001pt height=22.381919999999983pt/> sur l’axe k.
   En considérant chaque étude comme étant placée en supplémentaire, les coordonnées des points <img src="https://rawgit.com/riverarodrigoa/statis-matlab/master/svgs/ad07e638f19de5e096dfbad98663f373.svg?invert_in_darkmode" align=middle width=68.53951500000001pt height=26.033369999999973pt/> sont pour <img src="https://rawgit.com/riverarodrigoa/statis-matlab/master/svgs/2e267468a9308904874a78eb3f65733a.svg?invert_in_darkmode" align=middle width=61.464645pt height=22.381919999999983pt/> :
