@@ -4,14 +4,14 @@ function [Co,S,SS,RV] = statis_interstructure (X,M,Delta,Sup,norm,D,varnames)
 % Input variables
 % X = Tableaux avec les t ?tudes
 % M = Metrique (usuelment matrice identit?)
-% D = M?trique des poids, permettant le calcul des distances entre variables,
-%     usuelment 1/n * I, (o? I est la matrice identit?)
 % Delta = Matrice diagonal avec les poids
 % Sup = Matrice avec les tableaux supplementaires
 % norm = Option si on veut faire l'analyse en prendre en compre la norme
 %
 % PARAMETRES OPCIONELS
 % varnames = variable de type string qui a le nom des variables
+% D = M?trique des poids, permettant le calcul des distances entre variables,
+%     usuelment 1/n * I, (o? I est la matrice identit?)
 %
 % Output Variables
 % Co = Matrice avec les composantes principales
@@ -21,7 +21,7 @@ function [Co,S,SS,RV] = statis_interstructure (X,M,Delta,Sup,norm,D,varnames)
 % RV = Matrice avec les coefficients RV
 %
 % Use:
-% [Co,S] = statis_interstructure (X,M,Delta,Sup,norm,varnames,D)
+% [Co,S,SS,RV] = statis_interstructure (X,M,Delta,Sup,norm,D,varnames)
 %
 % Autor: Rodrigo Andres Rivera Martinez
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -127,7 +127,7 @@ if nargin < 3
     n= size(A,1);
     D =1/n * eye(n);
 end
-r = trace(D*A*D*B');
+r = trace(D*A*D*B);
 end
 
 function [An]= norme(A,D)
