@@ -1,9 +1,11 @@
-function [Co,S,SS,RV] = statis_interstructure (X,M,Delta,Sup,norm,varnames)
+function [Co,S,SS,RV] = statis_interstructure (X,M,Delta,Sup,norm,D,varnames)
 %% Fonction de calcul de de l'interstructure pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
 % X = Tableaux avec les t ?tudes
 % M = Metrique (usuelment matrice identit?)
+% D = M?trique des poids, permettant le calcul des distances entre variables,
+%     usuelment 1/n * I, (o? I est la matrice identit?)
 % Delta = Matrice diagonal avec les poids
 % Sup = Matrice avec les tableaux supplementaires
 % norm = Option si on veut faire l'analyse en prendre en compre la norme
@@ -19,7 +21,7 @@ function [Co,S,SS,RV] = statis_interstructure (X,M,Delta,Sup,norm,varnames)
 % RV = Matrice avec les coefficients RV
 %
 % Use:
-% [Co,S] = statis_interstructure (X,M,Delta,Sup,norm)
+% [Co,S] = statis_interstructure (X,M,Delta,Sup,norm,varnames,D)
 %
 % Autor: Rodrigo Andres Rivera Martinez
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -41,29 +43,52 @@ end
 if C ~= 3
     error('ERROR: Nb de variables doit etre egal dans les matrices X et Sup');
 end
-if size(varnames,2) < C || size(varnames,2) > C
-    error('ERROR: <varnames> doit etre de la meme taille que le nb de variables');
+
+if nargin<7
+    for i=1:n
+        varnames{i} = sprintf('Objet %d',i);
+    end
+else 
+    if size(varnames,2) < n || size(varnames,2) > n
+        error('ERROR: <varnames> doit etre de la meme taille que le nb d''?tudes');
+    end
 end
 %-------------------------------------------------------------------------------
 % Definition des objets
 %-------------------------------------------------------------------------------
 
 for i = 1:n
-     W(:,:,i) = X(:,:,i)*X(:,:,i)';
+     W(:,:,i) = X(:,:,i)*M*X(:,:,i)';
 end
 %-------------------------------------------------------------------------------
 % Calcul de la matrice des produits scalaires S
 %-------------------------------------------------------------------------------
-if ~norm
-    for i=1:n
-        for j=1:n
-            S(i,j)=prod_hs(W(:,:,i),W(:,:,j));
+if D
+    if ~norm
+        for i=1:n
+            for j=1:n
+                S(i,j)=prod_hs(W(:,:,i),W(:,:,j),D);
+            end
+        end
+    else
+        for i=1:n
+            for j=1:n
+                S(i,j)=(prod_hs(W(:,:,i),W(:,:,j),D))/(norme(W(:,:,i),D)*(norme(W(:,:,j),D)));
+            end
         end
     end
-else
-    for i=1:n
-        for j=1:n
-        S(i,j)=(prod_hs(W(:,:,i),W(:,:,j)))/(norme(W(:,:,i))*(norme(W(:,:,j))));
+else 
+    if ~norm
+        for i=1:n
+            for j=1:n
+                S(i,j)=prod_hs(W(:,:,i),W(:,:,j));
+            end
+        end
+    else
+        for i=1:n
+            for j=1:n
+                S(i,j)=(prod_hs(W(:,:,i),W(:,:,j)))/(norme(W(:,:,i))*(norme(W(:,:,j))));
+            end
         end
     end
 end
@@ -86,36 +111,47 @@ Co = Cp(:,1:2)
 
 scatter(Co(:,1),Co(:,2)); grid on; xlabel('Axe 1'); ylabel('Axe 2');
 title('Image euclidienne des objets')
+
+
 for i=1:n
     text(Co(i,1), Co(i,2),varnames(i));
 end
 
 end
 
-function [r] = prod_hs(A,B)
+function [r] = prod_hs(A,B,D)
 %--------------------------------
 % Definition de produit scalaire
 %--------------------------------
-r = trace(A*B');
+if nargin < 3
+    n= size(A,1);
+    D =1/n * eye(n);
+end
+r = trace(D*A*D*B');
 end
 
-function [An]= norme(A)
+function [An]= norme(A,D)
 %--------------------------------
 % Definition de norme
 %--------------------------------
-An= prod_hs(A,A);
+if nargin < 3
+    n= size(A,1);
+    D =1/n * eye(n);
+end
+
+An= sqrt(prod_hs(A,A,D));
 end
 
 function [XU] = ACP(X)
-% - Recherche des valeurs et vecteurs propres
+% Recherche des valeurs et vecteurs propres
 [VEPU, VAPU] = eig(X'*X);    
 VAPU         = diag(VAPU);        
 %
-% - Ordonnancement des valeurs et vecteurs propres
+% Ordonnancement des valeurs et vecteurs propres
 [VAPU,s] = sort(VAPU);
 VAPU     = VAPU(flipud(s)); 
 VEPU     = VEPU(:,flipud(s)); 
 %
-% - Nouvelles Coordonn?es (Composantes principales)
+% Nouvelles Coordonn?es (Composantes principales)
 XU = X * VEPU; 
 end
