@@ -1,4 +1,4 @@
-function [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_interstructure (X,M,Delta,Sup,norm,D,varnames)
+function [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X,M,Delta,Sup,norm,D,varnames)
 %% Fonction de calcul de de l'interstructure pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
@@ -25,7 +25,7 @@ function [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_interstructure (X,M,Delta,Sup,norm,D
 % VeP = Vecteurs propres du matrice SS
 %
 % Use:
-% [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_interstructure (X,M,Delta,Sup,norm,D,varnames)
+% [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X,M,Delta,Sup,norm,D,varnames)
 %
 % Autor: Rodrigo Andres Rivera Martinez
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
