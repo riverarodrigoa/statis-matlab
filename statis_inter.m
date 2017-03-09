@@ -11,7 +11,7 @@ function [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X,M,Delta,Sup,norm,D,varnames
 % PARAMETRES OPCIONELS
 % varnames = variable de type string qui a le nom des variables
 % D = M?trique des poids, permettant le calcul des distances entre variables,
-%     usuelment I (I est la matrice identit?)
+%     usuelment 1/n * I (I est la matrice identit?)
 %
 % Output Variables
 % Co = Matrice avec les composantes principales
@@ -37,8 +37,6 @@ if(nargin<5)
 end
 
 [L,C,n] = size(X);
-[L1,C1]=size(M);
-[L2,C2]=size(Delta);
 [L3,C3]=size(Sup);
 
 if L~=L3
@@ -135,7 +133,7 @@ function [r] = prod_hs(A,B,D)
 %--------------------------------
 if nargin < 3
     n= size(A,2);
-    D = eye(n);
+    D = 1/n * eye(n);
 end
 r = trace(D*A*D*B);
 end
@@ -146,7 +144,7 @@ function [An]= norme(A,D)
 %--------------------------------
 if nargin < 3
     n= size(A,2);
-    D =eye(n);
+    D =1/n * eye(n);
 end
 
 An= sqrt(prod_hs(A,A,D));
