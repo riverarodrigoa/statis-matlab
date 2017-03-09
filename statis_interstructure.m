@@ -11,7 +11,7 @@ function [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_interstructure (X,M,Delta,Sup,norm,D
 % PARAMETRES OPCIONELS
 % varnames = variable de type string qui a le nom des variables
 % D = M?trique des poids, permettant le calcul des distances entre variables,
-%     usuelment 1/n * I, (o? I est la matrice identit?)
+%     usuelment I (I est la matrice identit?)
 %
 % Output Variables
 % Co = Matrice avec les composantes principales
@@ -61,7 +61,6 @@ end
 % Definition des objets
 %-------------------------------------------------------------------------------
 % Centrage des tableaux
-
 for i = 1:n
     Xc(:,:,i) = centrer(X(:,:,i),mean(mean(X(:,:,i))), std(std(X(:,:,i))));
 end
@@ -136,7 +135,7 @@ function [r] = prod_hs(A,B,D)
 %--------------------------------
 if nargin < 3
     n= size(A,2);
-    D =1/n * eye(n);
+    D = eye(n);
 end
 r = trace(D*A*D*B);
 end
@@ -147,7 +146,7 @@ function [An]= norme(A,D)
 %--------------------------------
 if nargin < 3
     n= size(A,2);
-    D =1/n * eye(n);
+    D =eye(n);
 end
 
 An= sqrt(prod_hs(A,A,D));
