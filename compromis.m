@@ -3,8 +3,9 @@ function [ Wcomp ] = compromis(W,S,Delta,VaP,VeP,norm)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
 % W = Matrice avec les objets des t etudes
-% S = Matrice des produits scalaire entre les tableaux
-% Delta = Matrice diagonal avec les poids
+% S = Matrice des produits scalaire entre les Objets (W) affectes par le poids
+%     Delta
+% Delta = Matrice diagonal avec les poids (pi_i)
 % norm = Option si on veut faire l'analyse en prendre en compre la norme
 % VaP = Valeurs propres du matrice S
 % VeP = Vecteurs propres du matrice S
