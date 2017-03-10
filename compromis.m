@@ -28,11 +28,11 @@ Wcomp = 0;
 if ~norm
     alpha_c = sum(pi_t.*sqrt(SS));
     for i = 1:T
-      Wcomp = Wcomp + ((1/sqrt(VaP(i))*alpha_c*pi_t(i)*gamma(i))*W(:,:,i));
+      Wcomp = Wcomp + ((1/sqrt(VaP(1))*alpha_c*pi_t(i)*gamma(i))*W(:,:,i));
     end
 else
     for i = 1:T
-        Wcomp = Wcomp + ((1/sqrt(VaP(i))*pi_t(i)*gamma(i))*W(:,:,i));
+        Wcomp = Wcomp + ((1/sqrt(VaP(1))*pi_t(i)*gamma(i))*W(:,:,i));
     end
 end
 
