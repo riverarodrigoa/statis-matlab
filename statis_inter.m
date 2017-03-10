@@ -71,7 +71,7 @@ end
 %-------------------------------------------------------------------------------
 % Calcul de la matrice des produits scalaires S
 %-------------------------------------------------------------------------------
-if nargin == 6
+if nargin > 5
     if ~norm
         for i=1:n
             for j=1:n
@@ -161,7 +161,7 @@ function [XU,VAPU, VEPU] = ACP(X)
 % Calcul ACP
 %--------------------------------
 % Recherche des valeurs et vecteurs propres
-[VEPU, VAPU] = eig(X'*X);    
+[VEPU, VAPU] = eig(X);    
 VAPU         = diag(VAPU);        
 %
 % Ordonnancement des valeurs et vecteurs propres
