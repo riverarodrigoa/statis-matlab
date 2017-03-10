@@ -1,4 +1,4 @@
-function [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X,M,Delta,Sup,norm,D,varnames)
+function [Co,S,SS,RV,W,Wn,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,norm,D,varnames)
 %% Fonction de calcul de de l'interstructure pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
@@ -23,6 +23,7 @@ function [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X,M,Delta,Sup,norm,D,varnames
 % Wn = Matrice avec les objets des t etudes normes
 % VaP = Valeurs propres du matrice SS
 % VeP = Vecteurs propres du matrice SS
+% Xc = Donn?es centr?es et reduites
 %
 % Use:
 % [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X,M,Delta,Sup,norm,D,varnames)
@@ -116,8 +117,13 @@ SS = S*Delta;
 % Par le th?oreme de Frobenius on garde seulement les 2 premiers axes
 Co = Cp(:,1:2); 
 
+% Pourcentage d'inertie
+p= (VaP*100)/sum(VaP)
+
 figure;
-scatter(Co(:,1),Co(:,2)); grid on; xlabel('Axe 1'); ylabel('Axe 2');
+scatter(Co(:,1),Co(:,2)); grid on; 
+xlabel(sprintf('Axe 1 (Inertie: %.2f %%)',p(1)));
+ylabel(sprintf('Axe 2 (Inertie: %.2f %%)',p(2)));
 title('Image euclidienne des objets')
 
 

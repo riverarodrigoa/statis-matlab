@@ -11,7 +11,7 @@ function [ B ] = statis_intra( Wcomp, varnames, p )
 %     par default on garde les 2 premiers axes si cette variable n'est pas
 %     definie
 % Use:
-% [ B ] = statis_intra( Wcomp, varnames )
+% [ B ] = statis_intra( Wcomp, varnames,p )
 %
 % Autor: Rodrigo Andres Rivera Martinez
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -34,22 +34,18 @@ if nargin > 2
     end
 end
 
- B = XU(:,1:j); 
+B = XU(:,1:j); 
 
 disp('Valeur propres');
 disp(VAPU);
-
-
-fprintf('Pourcentage de l''inertie: %3f4\n',p_tot);
+fprintf('Pourcentage de l''inertie cumule: %.3f %%\n',p_tot);
 fprintf('Nb d''axes: %d\n',j);
-
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Plot de l'image euclidienne compromis des individus
 figure;
-scatter(B(:,1),B(:,2)); grid on; xlabel('Axe 1'); ylabel('Axe 2');
+scatter(B(:,1),B(:,2)); grid on;
+xlabel(sprintf('Axe 1 (Inertie: %.2f %%)',V_pour(1)));
+ylabel(sprintf('Axe 2 (Inertie: %.2f %%)',V_pour(2)));
 title('Image euclidienne compromis des individus')
 
 if nargin <2
@@ -61,6 +57,7 @@ end
 for i=1:L
     text(B(i,1), B(i,2),varnames(i));
 end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 end
 function [XU,VAPU, VEPU] = ACP(X)
