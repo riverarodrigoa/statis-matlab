@@ -1,4 +1,4 @@
-function [ B, Wd, VAPU, VEPU, corrvars ] = statis_intra( X, Wn, Wcomp, indnames, varetudes, varnames, p )
+function [ B, Wd, VAPU, VEPU, corrvars, V_pour ] = statis_intra( X, Wn, Wcomp, indnames, varetudes, varnames, p )
 %% Fonction de calcul de l'intrastructure pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
@@ -16,7 +16,7 @@ function [ B, Wd, VAPU, VEPU, corrvars ] = statis_intra( X, Wn, Wcomp, indnames,
 % Use:
 % [ B ] = statis_intra( Wcomp, indnames,p )
 %
-% Autor: Rodrigo Andres Rivera Martinez
+% Authors: Larbi Mouchou, Rodrigo Andres Rivera Martinez, Mounir Bendali-Braham, Nafise Gouard
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Definition de l'image euclidienne
@@ -88,31 +88,17 @@ figure;
 hold on;
 for var= 1:nb_vars
     plot(corrvars(:,var,1), corrvars(:,var,2), '-O');
-    for i = 1: 4
-        text(corrvars(i,var,1), corrvars(i,var,2), [varnames(var) num2str(i)]);
+    for t = 1: nb_etudes
+        text(corrvars(t,var,1), corrvars(t,var,2), [varnames(var) num2str(t)]);
     end;
 end;
 
-grid on;
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   Trajectoires   %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Corrélations individus
-
-
-for etude= 1:nb_etudes
-    WU(etude, :, :) = (Wn(:,:,etude) *D* VEPU) * diag(1./sqrt(VAPU)); 
-end;
-figure;
-hold on;
-for ind= 1:6
-    plot(WU(:,ind,1), WU(:,ind,2), '-O');
-    for i = 1: 4
-        text(WU(i,ind,1), WU(i,ind,2), [indnames(ind) 'An' num2str(i)]);
-    end;
-end;
+xlabel(sprintf('Axe 1 (Inertie: %.2f %%)',V_pour(1)));
+ylabel(sprintf('Axe 2 (Inertie: %.2f %%)',V_pour(2)));
+title('Corrélations des variables')
 
 grid on;
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

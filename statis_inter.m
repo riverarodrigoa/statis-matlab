@@ -8,7 +8,7 @@ function [Co,S,SS,RV,W,Wn,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,norm,D,varna
 % Sup = Matrice avec les tableaux supplementaires
 % norm = Option si on veut faire l'analyse en prendre en compre la norme
 %
-% PARAMETRES OPCIONELS
+% PARAMETRES OPTIONELS
 % varnames = variable de type string qui a le nom des variables
 % D = M?trique des poids, permettant le calcul des distances entre variables,
 %     usuelment 1/n * I (I est la matrice identit?)
@@ -28,7 +28,7 @@ function [Co,S,SS,RV,W,Wn,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,norm,D,varna
 % Use:
 % [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X,M,Delta,Sup,norm,D,varnames)
 %
-% Autor: Rodrigo Andres Rivera Martinez
+% Authors: Larbi Mouchou, Rodrigo Andres Rivera Martinez, Mounir Bendali-Braham, Nafise Gouard
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% D?finition des objets repr?sentatifs

@@ -28,8 +28,9 @@ varnames = {'Francais', 'Maths', 'Histoire'};
 [ Wcomp ] = compromis(Wn,SS,Delta,VaP,VeP,norm);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 indnames = {'Eleve 1','Eleve 2','Eleve 3','Eleve 4','Eleve 5','Eleve 6'};
-[ B, Wd, VAPU, VEPU, corrvars ] = statis_intra( X, Wn, Wcomp, indnames, varetude, varnames, 99 )
+[ B, Wd, VAPU, VEPU, corrvars, V_pour ] = statis_intra( X, Wn, Wcomp, indnames, varetude, varnames, 99 )
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+trajectoires( X, Wn, D, VEPU, VAPU, V_pour, indnames )
 
 % %% STATIS DB 2
 % clear; close all; clc;
@@ -49,13 +50,9 @@ indnames = {'Eleve 1','Eleve 2','Eleve 3','Eleve 4','Eleve 5','Eleve 6'};
 % Sup = X(:,:,4);
 % Delta = eye(size(X,3));
 % norm=1;
-% D =1/size(X,2) * eye(size(X,2));
-% %varnames = {'Ann?e 1','Ann?e 2','Ann?e 3','Ann?e 4'};
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter(X,M,Delta,Sup,norm);
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% [ Wcomp ] = compromis(Wn,SS,Delta,VaP,VeP,norm);
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% D =1/size(X,1) * eye(size(X,1));
+% 
+% 
 % for i=1:size(X,1) indnames{i} = sprintf('Individu %d',i); end
 % varnames{1}=sprintf('annee');
 % varnames{2}=sprintf('weight');
@@ -66,5 +63,12 @@ indnames = {'Eleve 1','Eleve 2','Eleve 3','Eleve 4','Eleve 5','Eleve 6'};
 % varnames{7}=sprintf('mollet');
 % varnames{8}=sprintf('tete');
 % varnames{9}=sprintf('pelvis');
-% [ B, Wd, VAPU, VEPU, corrvars ] = statis_intra( X, Wn, Wcomp, indnames, varnames, 99);
+% for t=1:size(X,3) varetude{t} = sprintf('Annee %d', t); end
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter(X,M,Delta,Sup,norm,D, varetude);
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% [ Wcomp ] = compromis(Wn,SS,Delta,VaP,VeP,norm);
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% [ B, Wd, VAPU, VEPU, corrvars, V_pour ] = statis_intra( X, Wn, Wcomp, indnames, varetude, varnames, 99 )
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%7
+% trajectoires( X, Wn, D, VEPU, VAPU, V_pour, indnames )

@@ -1,5 +1,5 @@
 function [ Wcomp ] = compromis(W,S,Delta,VaP,VeP,norm)
-%% Fonction de calcul de compromis pour la methode STATIS
+%% Fonction de calcul du compromis pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
 % W = Matrice avec les objets des t etudes
@@ -16,10 +16,10 @@ function [ Wcomp ] = compromis(W,S,Delta,VaP,VeP,norm)
 % Use:
 % [ Wcomp ] = compromis(W,S,Delta,VaP,VeP,norm)
 %
-% Autor: Rodrigo Andres Rivera Martinez
+% Authors: Larbi Mouchou, Rodrigo Andres Rivera Martinez, Mounir Bendali-Braham, Nafise Gouard
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% Calcul de l'expresion definitive du compromis
+%% Expression definitive du compromis
 [L,C,T] = size(W);
 pi_t=diag(Delta);
 SS = diag(S);
