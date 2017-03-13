@@ -165,12 +165,12 @@ function [XU,VAPU, VEPU] = ACP(X)
 VAPU         = diag(VAPU);        
 %
 % Ordonnancement des valeurs et vecteurs propres
-[VAPU,s] = sort(VAPU);
-VAPU     = VAPU(flipud(s)); 
-VEPU     = VEPU(:,flipud(s)); 
+[VAPU,s] = sort(VAPU, 'descend');
+% VAPU     = VAPU(flipud(s)); 
+VEPU     = VEPU(:,s); 
 %
 % Nouvelles Coordonn?es (Composantes principales)
-XU = X * VEPU; 
+XU = VEPU * diag(sqrt(VAPU)); 
 end
 
 function [Ac] = centrer(A,mean_A,std_A)
@@ -180,5 +180,5 @@ function [Ac] = centrer(A,mean_A,std_A)
 UN = ones(size(A));
 Me = UN * mean_A;
 Ecart_type = UN * diag(std_A);
-Ac  = (A - Me)./Ecart_type;
+Ac  = (A - Me);
 end
