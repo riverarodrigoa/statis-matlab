@@ -1,4 +1,4 @@
-function [Co,S,SS,RV,W,Wn,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,norm,D,varnames)
+function [Co,S,SS,RV,W,Wn,VaP,VeP,p] = statis_inter (X,M,Delta,Sup,norm,D,etunames)
 %% Fonction de calcul de de l'interstructure pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
@@ -8,7 +8,7 @@ function [Co,S,SS,RV,W,Wn,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,norm,D,varna
 % Sup = Matrice avec les tableaux supplementaires
 % norm = Option si on veut faire l'analyse en prendre en compre la norme
 %
-% PARAMETRES OPCIONELS
+% PARAMETRES OPTIONELS
 % varnames = variable de type string qui a le nom des variables
 % D = M?trique des poids, permettant le calcul des distances entre variables,
 %     usuelment 1/n * I (I est la matrice identit?)
@@ -26,9 +26,10 @@ function [Co,S,SS,RV,W,Wn,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,norm,D,varna
 % Xc = Donn?es centr?es et reduites
 %
 % Use:
-% [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X,M,Delta,Sup,norm,D,varnames)
+% [Co,S,SS,RV,W,Wn,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,norm,D,etunames)
 %
-% Autor: Rodrigo Andres Rivera Martinez
+% Author: Rodrigo Andres Rivera Martinez
+% Corrections: Larbi Mouchou, Mounir Bendali-Braham, Nafise Gouard
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% D?finition des objets repr?sentatifs
@@ -49,10 +50,10 @@ end
 
 if nargin<7
     for i=1:n
-        varnames{i} = sprintf('Objet %d',i);
+        etunames{i} = sprintf('Objet %d',i);
     end
 else 
-    if size(varnames,2) < n || size(varnames,2) > n
+    if size(etunames,2) < n || size(etunames,2) > n
         error('ERROR: <varnames> doit etre de la meme taille que le nb d''?tudes');
     end
 end
@@ -61,7 +62,7 @@ end
 %-------------------------------------------------------------------------------
 % Centrage des tableaux
 for i = 1:n
-    Xc(:,:,i) = centrer(X(:,:,i),mean(mean(X(:,:,i))), std(std(X(:,:,i))));
+    Xc(:,:,i) = centrer(X(:,:,i),mean(mean(X(:,:,i))));
 end
 
 for i = 1:n
@@ -114,11 +115,12 @@ end
 SS = S*Delta;
 
 [Cp,VaP,VeP] = ACP(SS);
+
 % Par le th?oreme de Frobenius on garde seulement les 2 premiers axes
 Co = Cp(:,1:2); 
 
 % Pourcentage d'inertie
-p= (VaP*100)/sum(VaP)
+p= (VaP*100)/sum(VaP);
 
 figure;
 scatter(Co(:,1),Co(:,2)); grid on; 
@@ -128,7 +130,7 @@ title('Image euclidienne des objets')
 
 
 for i=1:n
-    text(Co(i,1), Co(i,2),varnames(i));
+    text(Co(i,1), Co(i,2),etunames(i));
 end
 
 end
@@ -156,7 +158,7 @@ end
 An= sqrt(prod_hs(A,A,D));
 end
 
-function [XU,VAPU, VEPU] = ACP(X)
+function [XU, VAPU, VEPU] = ACP(X)
 %--------------------------------
 % Calcul ACP
 %--------------------------------
@@ -165,20 +167,18 @@ function [XU,VAPU, VEPU] = ACP(X)
 VAPU         = diag(VAPU);        
 %
 % Ordonnancement des valeurs et vecteurs propres
-[VAPU,s] = sort(VAPU, 'descend');
-% VAPU     = VAPU(flipud(s)); 
+[VAPU,s] = sort(VAPU, 'descend'); 
 VEPU     = VEPU(:,s); 
 %
 % Nouvelles Coordonn?es (Composantes principales)
 XU = VEPU * diag(sqrt(VAPU)); 
 end
 
-function [Ac] = centrer(A,mean_A,std_A)
+function [Ac] = centrer(A,mean_A)
 %--------------------------------
 % Centrage des donn?es
 %--------------------------------
 UN = ones(size(A));
 Me = UN * mean_A;
-Ecart_type = UN * diag(std_A);
 Ac  = (A - Me);
 end

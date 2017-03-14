@@ -16,10 +16,10 @@ function [ Wcomp ] = compromis(W,S,Delta,VaP,VeP,norm)
 % Use:
 % [ Wcomp ] = compromis(W,S,Delta,VaP,VeP,norm)
 %
-% Autor: Rodrigo Andres Rivera Martinez
+% Author: Rodrigo Andres Rivera Martinez
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% Calcul de l'expresion definitive du compromis
+%% Expresion definitive du compromis
 [L,C,T] = size(W);
 pi_t=diag(Delta);
 SS = diag(S);
