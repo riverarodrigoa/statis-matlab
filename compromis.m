@@ -1,4 +1,4 @@
-function [ Wcomp ] = compromis(W,S,Delta,VaP,VeP,norm)
+function [ Wcomp, alpha_t ] = compromis(W,S,Delta,VaP,VeP,norm)
 %% Fonction de calcul de compromis pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
@@ -25,15 +25,17 @@ pi_t=diag(Delta);
 SS = diag(S);
 gamma = VeP(:,1);
 Wcomp = 0;
-
+alpha_t = zeros(1,T);
 if ~norm
     alpha_c = sum(pi_t.*sqrt(SS));
     for i = 1:T
-      Wcomp = Wcomp + ((1/sqrt(VaP(1))*alpha_c*pi_t(i)*gamma(i))*W(:,:,i));
+        alpha_t(i) = (1/sqrt(VaP(1))*alpha_c*pi_t(i)*gamma(i));
+      Wcomp = Wcomp + (alpha_t(i)*W(:,:,i));
     end
 else
     for i = 1:T
-        Wcomp = Wcomp + ((1/sqrt(VaP(1))*pi_t(i)*gamma(i))*W(:,:,i));
+        alpha_t(i) = (1/sqrt(VaP(1))*pi_t(i)*gamma(i));
+        Wcomp = Wcomp + (alpha_t(i)*W(:,:,i));
     end
 end
 

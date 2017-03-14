@@ -1,4 +1,4 @@
-function [ B, Wd, VAPU, VEPU, corrvars, V_pour ] = statis_intra( X, Wn, Wcomp, indnames, varetudes, varnames, p )
+function [ B, Wd, VAPU, VEPU, corrvars, V_pour ] = statis_intra( X, Wn, Wcomp, alpha_t, indnames, varetudes, varnames, p )
 %% Fonction de calcul de l'intrastructure pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
@@ -26,8 +26,8 @@ function [ B, Wd, VAPU, VEPU, corrvars, V_pour ] = statis_intra( X, Wn, Wcomp, i
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Centrage et reduction des donn?es 
-[L,C,n] = size(X);
-for i=1:n
+[L,C,T] = size(X);
+for i=1:T
     Xc(:,:,i) = centrer(X(:,:,i),mean(mean(X(:,:,i))), std(std(X(:,:,i))));
 end
 %% Definition de l'image euclidienne
@@ -55,6 +55,27 @@ disp(VAPU);
 fprintf('Pourcentage de l''inertie cumule: %.3f %%\n',p_tot);
 fprintf('Nb d''axes: %d\n',j);
 
+%% Validation de l'image euclidienne
+alpha = sqrt(alpha_t);
+B_val = alpha(1)*Xc(:,:,1);
+for i=1:T
+    B_val =[B_val [alpha(i)*Xc(:,:,i)]];
+end
+% ACP du B_val
+[XU_v, VaP_v, VeP_v] = ACP(B_val);
+
+B_val_c = XU_v(:,1:j);
+
+Decision = isequal(B,B_val_c);
+if Decision
+    disp('[Validation test] Image euclidienne compromis correcte');
+else
+    disp('[Validation test] Image euclidienne compromis incorrecte');
+    disp('Image euclidienne');
+    disp(B);
+    disp('Validation');
+    disp(B_val_c);
+end
 %% Correlations des variables avec les axes du compromis
 [L1,C1,n] = size(Xc);
 
@@ -67,21 +88,32 @@ for l=1:j % axes
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Plot de l'image euclidienne compromis des individus
-figure;
-scatter(B(:,1),B(:,2)); grid on;
-xlabel(sprintf('Axe 1 (Inertie: %.2f %%)',V_pour(1)));
-ylabel(sprintf('Axe 2 (Inertie: %.2f %%)',V_pour(2)));
-title('Image euclidienne compromis des individus')
-
 if nargin <=4
     for i=1:L
         indnames{i} = sprintf('Individu %d',i);
     end
 end
 
-for i=1:L
-    text(B(i,1), B(i,2),indnames(i));
+for m=1:j
+    for k=2:j
+        if m==k
+        else
+        figure;
+        scatter(B(:,m),B(:,k)); grid on;
+        xlabel(sprintf('Axe %d (Inertie: %.2f %%)',m,V_pour(m)));
+        ylabel(sprintf('Axe %d (Inertie: %.2f %%)',k,V_pour(k)));
+        title(sprintf('Image euclidienne compromis des individus (Plan %d - %d)',m,k));
+            for i=1:L
+                text(B(i,1), B(i,2),indnames(i));
+            end
+        end
+    end
 end
+
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Plot des correlations des variables
 [nb_inds, nb_vars, nb_etudes] = size(X);
