@@ -28,7 +28,7 @@ function [ B, Wd, VAPU, VEPU, corrvars, V_pour ] = statis_intra( X, Wn, Wcomp, a
 %% Centrage et reduction des donn?es 
 [L,C,T] = size(X);
 for i=1:T
-    Xc(:,:,i) = centrer(X(:,:,i),mean(mean(X(:,:,i))), std(std(X(:,:,i))));
+    Xc(:,:,i) = centrer(X(:,:,i),mean(mean(X(:,:,i))), std(std(X(:,:,i))),0);
 end
 %% Definition de l'image euclidienne
 [L,C] = size(Wcomp);
@@ -60,15 +60,18 @@ disp('Valeur propres');
 disp(VAPU);
 fprintf('Pourcentage de l''inertie cumule: %.3f %%\n',p_tot);
 fprintf('Nb d''axes: %d\n',j);
-
-%% Validation de l'image euclidienne
+%% Image eucclidienne
+% B = VEPU * diag(sqrt(VAPU));
+% B = B(:,1:j);
+%% Validation de l'image euclidienne compromis
 alpha = sqrt(alpha_t);
 B_val = alpha(1)*Xc(:,:,1);
-for i=1:T
+for i=2:T
     B_val =[B_val [alpha(i)*Xc(:,:,i)]];
 end
+size(B_val)
 % ACP du B_val
-[XU_v, VaP_v, VeP_v] = ACP(B_val);
+[XU_v, ~, ~] = ACP4(B_val);
 
 B_val_c = XU_v(:,1:j);
 
@@ -116,10 +119,6 @@ for m=1:j
     end
 end
 
-
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Plot des correlations des variables
 [nb_inds, nb_vars, nb_etudes] = size(X);
@@ -138,11 +137,25 @@ title('Corr?lations des variables')
 
 end
 
-
-
 function [XU, VAPU, VEPU] = ACP(X)
 %--------------------------------
-% Calcul ACP
+% Calcul ACP modifie
+%--------------------------------
+% Recherche des valeurs et vecteurs propres
+[VEPU, VAPU] = eig(X);    
+VAPU         = diag(VAPU);        
+%
+% Ordonnancement des valeurs et vecteurs propres
+[VAPU,s] = sort(VAPU, 'descend'); 
+VEPU     = VEPU(:,s); 
+%
+% Nouvelles Coordonn?es (Composantes principales)
+XU = (X * VEPU) * diag(1./sqrt(VAPU)); 
+end
+
+function [XU, VAPU, VEPU] = ACP2(X)
+%--------------------------------
+% Calcul ACP classique
 %--------------------------------
 % Recherche des valeurs et vecteurs propres
 [VEPU, VAPU] = eig(X'*X);    
@@ -157,12 +170,50 @@ VEPU     = VEPU(:,flipud(s));
 XU = X * VEPU; 
 end
 
-function [Ac] = centrer(A,mean_A,std_A)
+function [XU, VAPU, VEPU] = ACP3(X)
+%--------------------------------
+% Calcul ACP classique mod
+%--------------------------------
+% Recherche des valeurs et vecteurs propres
+[VEPU, VAPU] = eig(X'*X);    
+VAPU         = diag(VAPU);        
+%
+% Ordonnancement des valeurs et vecteurs propres
+[VAPU,s] = sort(VAPU);
+VAPU     = VAPU(flipud(s)); 
+VEPU     = VEPU(:,flipud(s)); 
+%
+% Nouvelles Coordonn?es (Composantes principales)
+XU = (X * VEPU) * diag(1./sqrt(VAPU)); 
+end
+
+function [XU, VAPU, VEPU] = ACP4(X)
+%--------------------------------
+% Calcul ACP classique mod2
+%--------------------------------
+% Recherche des valeurs et vecteurs propres
+[VEPU, VAPU] = eig(X'*X);    
+VAPU         = diag(VAPU);        
+%
+% Ordonnancement des valeurs et vecteurs propres
+[VAPU,s] = sort(VAPU, 'descend'); 
+VEPU     = VEPU(:,s); 
+%
+% Nouvelles Coordonn?es (Composantes principales)
+XU = VEPU * diag(sqrt(VAPU));  
+end
+
+function [Ac] = centrer(A,mean_A,std_A,r)
 %--------------------------------
 % Centrage des donn?es
 %--------------------------------
 UN = ones(size(A));
 Me = UN * mean_A;
-Ecart_type = UN * diag(std_A);
-Ac  = (A - Me)./Ecart_type;
+    if r
+        Ecart_type = UN * diag(std_A);
+        Ac  = (A - Me)./Ecart_type;
+    else
+        Ac  = (A - Me);
+    end
 end
+
