@@ -37,8 +37,14 @@ Wd = Wcomp*D;
 
 [XU,VAPU, VEPU] = ACP(Wd);
 n = size(VAPU,1);
+
+for i = 1:n
+    CP_Wd(:,i)= (1./sqrt(VAPU(i)))*Wd*VEPU(:,i);
+end
+
 V_pour = (VAPU*100)/sum(VAPU);
 p_tot = sum(V_pour(1:2));
+
 j=2;
 if nargin < 3
     while p > p_tot
@@ -48,7 +54,7 @@ if nargin < 3
     end
 end
 
-B = XU(:,1:j); 
+B = CP_Wd(:,1:j);
 
 disp('Valeur propres');
 disp(VAPU);
