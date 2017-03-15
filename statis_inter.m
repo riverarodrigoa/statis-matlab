@@ -1,4 +1,4 @@
-function [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X,M,D,Delta,norm,etunames)
+function [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X,M,D,Delta,norm,r,etunames)
 %% Fonction de calcul de de l'interstructure pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
@@ -12,6 +12,7 @@ function [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X,M,D,Delta,norm,etunames)
 % varnames = variable de type string qui a le nom des variables
 % D = M?trique des poids, permettant le calcul des distances entre variables,
 %     usuelment 1/n * I (I est la matrice identit?)
+% r = Centrage et/ou reduction (1: Centrage et reduction, 0:Centrage)
 %
 % Output Variables
 % Co = Matrice avec les composantes principales
@@ -25,7 +26,7 @@ function [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X,M,D,Delta,norm,etunames)
 % VeP = Vecteurs propres du matrice SS
 %
 % Use:
-% [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X,M,D,Delta,norm,etunames)
+% [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X,M,D,Delta,norm,r,etunames)
 %
 % Author: Rodrigo Andres Rivera Martinez
 % Corrections: Larbi Mouchou, Mounir Bendali-Braham, Nafise Gouard
@@ -60,6 +61,10 @@ else
         norm = 1;
         disp('[DEFAULT] Norme = 1');
     end
+    if ~exist('r','var') || isempty(r) % reduit par default
+        r = 1;
+        disp('[DEFAULT] Centrage et reduction = 1');
+    end
     if ~exist('etunames','var') || isempty(etunames)
         for i=1:n
             etunames{i} = sprintf('Objet %d',i);
@@ -75,9 +80,9 @@ disp('****************************');
 %-------------------------------------------------------------------------------
 % Definition des objets
 %-------------------------------------------------------------------------------
-% Centrage des tableaux
+% Centrage/reduction des tableaux
 for i = 1:n
-    Xc(:,:,i) = centrer(X(:,:,i),mean(mean(X(:,:,i))));
+    Xc(:,:,i) = centrer(X(:,:,i),mean(mean(X(:,:,i))),std(std(X(:,:,i))),r);
 end
 
 % Calcul des objets
@@ -174,11 +179,17 @@ VEPU     = VEPU(:,s);
 XU = VEPU * diag(sqrt(VAPU)); 
 end
 
-function [Ac] = centrer(A,mean_A)
+function [Ac] = centrer(A,mean_A,std_A,r)
 %--------------------------------
 % Centrage des donn?es
 %--------------------------------
 UN = ones(size(A));
 Me = UN * mean_A;
-Ac  = (A - Me);
+if r
+    Ecart_type = UN * diag(std_A);
+    Ac  = (A - Me)./Ecart_type;
+else
+    Ac  = (A - Me);
+end
+
 end
