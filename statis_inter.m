@@ -50,20 +50,22 @@ else
         fprintf('[DEFAULT] M = I [%d x %d]\n',size(M));
     end
     if ~exist('D','var') || isempty(D)
-        D = 1/L * eye(L);
+
+        D = (1/L).* eye(L);
         fprintf('[DEFAULT] D = 1/%d *I [%d x %d]\n',L,size(D));
     end
     if ~exist('Delta','var') || isempty(Delta)
-        Delta = 1/n*eye(n);
+        Delta = (1/n).*eye(n);
         fprintf('[DEFAULT] Delta = 1/%d *I [%d x %d]\n',n,size(Delta));
     end
     if ~exist('norm','var') || isempty(norm) % norm? par default
         norm = 1;
-        disp('[DEFAULT] Norme = 1');
+        fprintf('[DEFAULT] Norme = %d\n',norm);
     end
     if ~exist('r','var') || isempty(r) % reduit par default
         r = 1;
-        disp('[DEFAULT] Centrage et reduction = 1');
+        fprintf('[DEFAULT] Centrage et reduction = %d\n',r);
+
     end
     if ~exist('etunames','var') || isempty(etunames)
         for i=1:n
@@ -82,7 +84,7 @@ disp('****************************');
 %-------------------------------------------------------------------------------
 % Centrage/reduction des tableaux
 for i = 1:n
-    Xc(:,:,i) = centrer(X(:,:,i),mean(mean(X(:,:,i))),std(std(X(:,:,i))),r);
+    Xc(:,:,i) = centrer(X(:,:,i),r);
 end
 
 % Calcul des objets
@@ -90,11 +92,12 @@ W = zeros(L,L,n);
 if norm
     for i = 1:n
         W(:,:,i) = Xc(:,:,i)*M*Xc(:,:,i)';
-        Wn(:,:,i) = W(:,:,i)/sqrt(norme(W(:,:,i),D));
+        Wn(:,:,i) = W(:,:,i)./sqrt(norme(W(:,:,i),D));
     end
 else
     for i = 1:n
         W(:,:,i) = Xc(:,:,i)*M*Xc(:,:,i)';
+        Wn(:,:,i)= Xc(:,:,i)*M*Xc(:,:,i)';
     end
 end
 %-------------------------------------------------------------------------------
@@ -110,7 +113,7 @@ if ~norm
 else
     for i=1:n
         for j=1:n
-            S(i,j)=(prod_hs(W(:,:,i),W(:,:,j),D))/(norme(W(:,:,i),D)*(norme(W(:,:,j),D)));
+            S(i,j)=(prod_hs(W(:,:,i),W(:,:,j),D))./(norme(W(:,:,i),D)*(norme(W(:,:,j),D)));
         end
     end
 end
@@ -133,12 +136,13 @@ SS = S*Delta;
 
 % Par le th?oreme de Frobenius on garde seulement les 2 premiers axes
 Co = Cp(:,1:2); 
-
+disp(Co)
 % Pourcentage d'inertie
 p = (VaP*100)/sum(VaP);
 
 figure;
-scatter(Co(:,1),Co(:,2)); grid on; 
+scatter(Co(:,1),Co(:,2)); grid on;
+if norm; xlim([0,1]); ylim([-1,1]); else xlim([0,Inf]);  end
 xlabel(sprintf('Axe 1 (Inertie: %.2f %%)',p(1)));
 ylabel(sprintf('Axe 2 (Inertie: %.2f %%)',p(2)));
 title('Image euclidienne des objets','FontSize',16);
@@ -179,17 +183,20 @@ VEPU     = VEPU(:,s);
 XU = VEPU * diag(sqrt(VAPU)); 
 end
 
-function [Ac] = centrer(A,mean_A,std_A,r)
+function [Acr] = centrer(A,r)
 %--------------------------------
 % Centrage des donn?es
 %--------------------------------
-UN = ones(size(A));
-Me = UN * mean_A;
-if r
-    Ecart_type = UN * diag(std_A);
-    Ac  = (A - Me)./Ecart_type;
-else
-    Ac  = (A - Me);
-end
 
+ [n,p]=size(A);
+ 
+ if r
+     %--------------------------------
+     % Reduire les rableaux
+     %--------------------------------
+     Ac= A - repmat(mean(A),n,1);
+     Acr=Ac.*repmat(sqrt(n-1./(n.*var(Ac))),n,1);
+ else
+     Acr= A - repmat(mean(A),n,1); 
+ end
 end
