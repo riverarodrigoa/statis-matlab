@@ -1,10 +1,11 @@
-function [ Wcomp ] = compromis(W,S,Delta,VaP,VeP,norm)
+function [ Wcomp, alpha_t ] = compromis(W,S,Delta,VaP,VeP,norm)
 %% Fonction de calcul de compromis pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
 % W = Matrice avec les objets des t etudes
-% S = Matrice des produits scalaire entre les tableaux
-% Delta = Matrice diagonal avec les poids
+% S = Matrice des produits scalaire entre les Objets (W) affectes par le poids
+%     Delta
+% Delta = Matrice diagonal avec les poids (pi_i)
 % norm = Option si on veut faire l'analyse en prendre en compre la norme
 % VaP = Valeurs propres du matrice S
 % VeP = Vecteurs propres du matrice S
@@ -15,24 +16,26 @@ function [ Wcomp ] = compromis(W,S,Delta,VaP,VeP,norm)
 % Use:
 % [ Wcomp ] = compromis(W,S,Delta,VaP,VeP,norm)
 %
-% Autor: Rodrigo Andres Rivera Martinez
+% Author: Rodrigo Andres Rivera Martinez
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% Calcul de l'expresion definitive du compromis
+%% Expresion definitive du compromis
 [L,C,T] = size(W);
 pi_t=diag(Delta);
 SS = diag(S);
 gamma = VeP(:,1);
 Wcomp = 0;
-
+alpha_t = zeros(1,T);
 if ~norm
     alpha_c = sum(pi_t.*sqrt(SS));
     for i = 1:T
-      Wcomp = Wcomp + ((1/sqrt(VaP(i))*alpha_c*pi_t(i)*gamma(i))*W(:,:,i));
+        alpha_t(i) = (1./sqrt(VaP(1))*alpha_c*pi_t(i)*gamma(i));
+      Wcomp = Wcomp + (alpha_t(i)*W(:,:,i));
     end
 else
     for i = 1:T
-        Wcomp = Wcomp + ((1/sqrt(VaP(i))*pi_t(i)*gamma(i))*W(:,:,i));
+        alpha_t(i) = (1/sqrt(VaP(1))*pi_t(i)*gamma(i));
+        Wcomp = Wcomp + (alpha_t(i)*W(:,:,i));
     end
 end
 

@@ -22,6 +22,7 @@ norm=0; reduit=0;
 D =1/size(X,1) * eye(size(X,1));
 for i=1:size(X,3)
     etunames{i} = sprintf('Année %d',i);
+
 end
 %varetude = {'Ann?e 1','Ann?e 2','Ann?e 3','Ann?e 4'};
 varnames = {'Francais', 'Maths', 'Histoire'};
@@ -59,7 +60,6 @@ Sup = X(:,:,4);
 Delta = eye(size(X,3));
 norm=1;
 D =1/size(X,1) * eye(size(X,1));
-
 
 % for i=1:size(X,1) indnames{i} = sprintf('Individu %d',i); end
 % varnames{1}=sprintf('annee');

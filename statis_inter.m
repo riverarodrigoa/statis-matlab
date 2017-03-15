@@ -50,6 +50,7 @@ else
         fprintf('[DEFAULT] M = I [%d x %d]\n',size(M));
     end
     if ~exist('D','var') || isempty(D)
+
         D = (1/L).* eye(L);
         fprintf('[DEFAULT] D = 1/%d *I [%d x %d]\n',L,size(D));
     end
@@ -64,6 +65,7 @@ else
     if ~exist('r','var') || isempty(r) % reduit par default
         r = 1;
         fprintf('[DEFAULT] Centrage et reduction = %d\n',r);
+
     end
     if ~exist('etunames','var') || isempty(etunames)
         for i=1:n
@@ -97,7 +99,6 @@ else
         W(:,:,i) = Xc(:,:,i)*M*Xc(:,:,i)';
         Wn(:,:,i)= Xc(:,:,i)*M*Xc(:,:,i)';
     end
-   
 end
 %-------------------------------------------------------------------------------
 % Calcul de la matrice des produits scalaires S
@@ -116,6 +117,7 @@ else
         end
     end
 end
+
 %-------------------------------------------------------------------------------
 % Calcul de coefficient RV
 %-------------------------------------------------------------------------------
@@ -170,7 +172,7 @@ function [XU, VAPU, VEPU] = ACP(X)
 % Calcul ACP
 %--------------------------------
 % Recherche des valeurs et vecteurs propres
-[VEPU, VAPU] = eig(X'*X);    
+[VEPU, VAPU] = eig(X);    
 VAPU         = diag(VAPU);        
 %
 % Ordonnancement des valeurs et vecteurs propres
