@@ -1,4 +1,4 @@
-function [Co,S,SS,RV,W,Wn,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,norm,D,varnames)
+function [Co,S,SS,RV,W,Wn,VaP,VeP,p] = statis_inter (X,M,Delta,Sup,reduit,norm,D,etunames)
 %% Fonction de calcul de de l'interstructure pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
@@ -6,9 +6,10 @@ function [Co,S,SS,RV,W,Wn,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,norm,D,varna
 % M = Metrique (usuelment matrice identit?)
 % Delta = Matrice diagonal avec les poids
 % Sup = Matrice avec les tableaux supplementaires
+% reduit= option si on veut reduire nos données
 % norm = Option si on veut faire l'analyse en prendre en compre la norme
 %
-% PARAMETRES OPCIONELS
+% PARAMETRES OPTIONELS
 % varnames = variable de type string qui a le nom des variables
 % D = M?trique des poids, permettant le calcul des distances entre variables,
 %     usuelment 1/n * I (I est la matrice identit?)
@@ -26,15 +27,16 @@ function [Co,S,SS,RV,W,Wn,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,norm,D,varna
 % Xc = Donn?es centr?es et reduites
 %
 % Use:
-% [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X,M,Delta,Sup,norm,D,varnames)
+% [Co,S,SS,RV,W,Wn,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,reduit,norm,D,etunames)
 %
-% Autor: Rodrigo Andres Rivera Martinez
+% Author: Rodrigo Andres Rivera Martinez
+% Corrections: Larbi Mouchou, Mounir Bendali-Braham, Nafise Gouard
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% D?finition des objets repr?sentatifs
+%% Definition des objets representatifs
 % Verification des matrices
-if(nargin<5)
-    error('SYNTAXE ERROR: statis_interstructure (X,M,Delta,Sup,norm)');
+if(nargin<6)
+    error('SYNTAXE ERROR: statis_interstructure (X,M,Delta,Sup,norm,reduit)');
 end
 
 [L,C,n] = size(X);
@@ -47,13 +49,13 @@ if C ~= C3
     error('ERROR: Nb de variables doit etre egal dans les matrices X et Sup');
 end
 
-if nargin<7
+if nargin<8
     for i=1:n
-        varnames{i} = sprintf('Objet %d',i);
+        etunames{i} = sprintf('Objet %d',i);
     end
 else 
-    if size(varnames,2) < n || size(varnames,2) > n
-        error('ERROR: <varnames> doit etre de la meme taille que le nb d''?tudes');
+    if size(etunames,2) < n || size(etunames,2) > n
+        error('ERROR: <varnames> doit etre de la meme taille que le nb d''etudes');
     end
 end
 %-------------------------------------------------------------------------------
@@ -61,17 +63,31 @@ end
 %-------------------------------------------------------------------------------
 % Centrage des tableaux
 for i = 1:n
-    Xc(:,:,i) = centrer(X(:,:,i),mean(mean(X(:,:,i))), std(std(X(:,:,i))));
+    Xc(:,:,i) = centrer(X(:,:,i));
+end
+
+
+% Reduire des tableaux
+if ~reduit
+    for i=1:n
+        Xcr(:,:,i)=Xc(:,:,i)
+    end    
+else
+    for i=1:n        
+        Xcr(:,:,i)=reduire(Xc(:,:,i))
+    end
 end
 
 for i = 1:n
-     W(:,:,i) = Xc(:,:,i)*M*Xc(:,:,i)';
+     W(:,:,i) = Xcr(:,:,i)*M*Xcr(:,:,i)';
      Wn(:,:,i) = W(:,:,i)/sqrt(norme(W(:,:,i)));
 end
+
+
 %-------------------------------------------------------------------------------
 % Calcul de la matrice des produits scalaires S
 %-------------------------------------------------------------------------------
-if nargin == 6
+if nargin > 6
     if ~norm
         for i=1:n
             for j=1:n
@@ -114,11 +130,12 @@ end
 SS = S*Delta;
 
 [Cp,VaP,VeP] = ACP(SS);
+
 % Par le th?oreme de Frobenius on garde seulement les 2 premiers axes
 Co = Cp(:,1:2); 
 
 % Pourcentage d'inertie
-p= (VaP*100)/sum(VaP)
+p= (VaP*100)/sum(VaP);
 
 figure;
 scatter(Co(:,1),Co(:,2)); grid on; 
@@ -128,7 +145,7 @@ title('Image euclidienne des objets')
 
 
 for i=1:n
-    text(Co(i,1), Co(i,2),varnames(i));
+    text(Co(i,1), Co(i,2),etunames(i));
 end
 
 end
@@ -144,6 +161,14 @@ end
 r = trace(D*A*D*B);
 end
 
+function [Ar]=reduire(A)
+%--------------------------------
+% Reduire les rableaux
+%--------------------------------
+[n,p]=size(A);
+Ar=A.*repmat(sqrt(n-1./(n.*var(A))),n,1);
+end
+
 function [An]= norme(A,D)
 %--------------------------------
 % Definition de norme
@@ -156,29 +181,26 @@ end
 An= sqrt(prod_hs(A,A,D));
 end
 
-function [XU,VAPU, VEPU] = ACP(X)
+function [XU, VAPU, VEPU] = ACP(X)
 %--------------------------------
 % Calcul ACP
 %--------------------------------
 % Recherche des valeurs et vecteurs propres
-[VEPU, VAPU] = eig(X'*X);    
+[VEPU, VAPU] = eig(X);    
 VAPU         = diag(VAPU);        
 %
 % Ordonnancement des valeurs et vecteurs propres
-[VAPU,s] = sort(VAPU);
-VAPU     = VAPU(flipud(s)); 
-VEPU     = VEPU(:,flipud(s)); 
+[VAPU,s] = sort(VAPU, 'descend'); 
+VEPU     = VEPU(:,s); 
 %
 % Nouvelles Coordonn?es (Composantes principales)
-XU = X * VEPU; 
+XU = VEPU * diag(sqrt(VAPU)); 
 end
 
-function [Ac] = centrer(A,mean_A,std_A)
+function [Ac] = centrer(A)
 %--------------------------------
 % Centrage des donn?es
 %--------------------------------
-UN = ones(size(A));
-Me = UN * mean_A;
-Ecart_type = UN * diag(std_A);
-Ac  = (A - Me)./Ecart_type;
+ [n,p]=size(A);
+ Ac= A - repmat(mean(A),n,1);
 end
