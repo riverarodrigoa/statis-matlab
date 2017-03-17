@@ -2,56 +2,49 @@
 clear; close all; clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Load Data 1
-% path_data = '~Data'; 
-% filename=[path_data,'nnotes_FAT.xls'];
-Data=xlsread('Data/nnotes_FAT.xls');
+path_data = '~/Documents/UNIVERSITE_PARIS_SACLAY/M2_TRIED/Projet_long/Data/'; 
+filename=[path_data,'nnotes_FAT.xls'];
+Data=xlsread(filename);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Parametres Interstructure
+% Parametres
 X = zeros(6,3);
-Data;
 j=1;
 for i = 1:3:11 
     X(:,:,j) = Data(:,i:i+2);
     j=j+1;
 end
-X=X(:,:,1:4);
-M = eye(size(X,2));
-Sup = X(:,:,1);
-Delta = 1/size(X,3)*eye(size(X,3));
-norm=0; reduit=0;
+
+norm=1;
+Delta = eye(size(X,3));
 D =1/size(X,1) * eye(size(X,1));
+
+etunames{size(X,3)}=[];
 for i=1:size(X,3)
-    etunames{i} = sprintf('Année %d',i);
-
+    etunames{i} = sprintf('Ann?e %d',i);
 end
-%varetude = {'Ann?e 1','Ann?e 2','Ann?e 3','Ann?e 4'};
-varnames = {'Francais', 'Maths', 'Histoire'};
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% statis_inter (X,M,D,Delta,norm,r,etunames)
-norm = 1 ;
-[Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-[ Wcomp, alpha_t ] = compromis(Wn,SS,Delta,VaP,VeP,norm);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+varnames = {'Francais', 'Math', 'Histoire'};
 indnames = {'Eleve 1','Eleve 2','Eleve 3','Eleve 4','Eleve 5','Eleve 6'};
-%varnames = {'Francais','Math','Histoire'};
-[ B, Wd, VAPU, VEPU, corrvars, V_pour ] = statis_intra( X, Wn, Wcomp, alpha_t, indnames, etunames, varnames, 80 );
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-trajectoires( X, Wn, D, VEPU, VAPU, V_pour, indnames )
-
+[Co,SS,RV,W,VaP,VeP,Xcr]=statis_inter(X,[],[],[],norm,etunames);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+[ Wcomp, alpha_t ] = compromis(W,SS,Delta,VaP,VeP,norm);
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+[ B, Wd, VAPU, VEPU, corrvars, V_pour ] = statis_intra( X, W, Wcomp, alpha_t, indnames, etunames, varnames, 80 );
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+trajectoires( X, W, D, VEPU, VAPU, V_pour, indnames )
 %%
 %% STATIS DB 2
 clear; close all; clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Load Data 2
-path_data = 'Data/'; 
+path_data = '~/Documents/UNIVERSITE_PARIS_SACLAY/M2_TRIED/Projet_long/Data/'; 
 filename=[path_data,'croiss_tall.xls'];
 Data=xlsread(filename);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Parametres Interstructure
 
 for(i=1:size(Data,1)/12)
-     X(:,:,i)=Data(12*(i-1)+1:12*(i),:)
+     X(:,:,i)=Data(12*(i-1)+1:12*(i),:);
 end
 
 X=X(:,2:end,:);
@@ -73,10 +66,10 @@ D =1/size(X,1) * eye(size(X,1));
 % varnames{9}=sprintf('pelvis');
 % for t=1:size(X,3) varetude{t} = sprintf('Annee %d', t); end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-[Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X);
+[Co,SS,RV,W,VaP,VeP,Xcr] = statis_inter (X);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-[ Wcomp ] = compromis(Wn,SS,Delta,VaP,VeP,norm);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-[ B, Wd, VAPU, VEPU, corrvars, V_pour ] = statis_intra( X, Wn, Wcomp, indnames, varetude, varnames, 99 )
+[ Wcomp ] = compromis(W,SS,Delta,VaP,VeP,norm);
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+[ B, Wd, VAPU, VEPU, corrvars, V_pour ] = statis_intra( X, Wn, Wcomp, indnames, varetude, varnames, 99 );
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%7
 trajectoires( X, Wn, D, VEPU, VAPU, V_pour, indnames )

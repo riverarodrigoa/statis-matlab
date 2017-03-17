@@ -1,4 +1,4 @@
-function [Co,SS,RV,W,VaP,VeP,Xcr] = statis_inter (X,M,D,Delta,norm,etunames)
+function [Co,S,RV,W,VaP,VeP,Xcr] = statis_inter (X,M,D,Delta,norm,etunames)
 %% Fonction de calcul de de l'interstructure pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
@@ -109,21 +109,16 @@ for i=1:n
         S(i,j)=prod_hs(W(:,:,i),W(:,:,j),D);
     end
 end
-disp('S');
-disp(S)
+S=S./S(1,1);
 %-------------------------------------------------------------------------------
 % Calcul de coefficient RV
 %-------------------------------------------------------------------------------
 RV = zeros(n);
-if norm
-    RV = S;
-else
     for i=1:n
         for j=1:n
             RV(i,j) = S(i,j)/(sqrt(S(i,i))*(sqrt(S(j,j))));
         end
     end
-end
 disp('RV');
 disp(RV)
 %-------------------------------------------------------------------------------
@@ -183,13 +178,20 @@ VEPU     = VEPU(:,s);
 %
 % Nouvelles Coordonn?es (Composantes principales)
 XU = VEPU * diag(sqrt(VAPU)); 
+XU(:,1) = sign(XU(1,1)).*(XU(:,1));
 end
 
 function [Acr] = centrer(A)
 %----------------------------------
 % Centrage et reduction des donnees
 %----------------------------------
-[n,p]=size(A);
-Ac= A - repmat(mean(A),n,1);
-Acr=Ac.*repmat(sqrt(n-1./(n.*var(Ac))),n,1);
+% [n,p]=size(A);
+% Ac= A - repmat(mean(A),n,1);
+% Acr=Ac.*repmat(std(A),n,1);
+
+UN = ones(size(A));
+Me = UN * diag(mean(mean(A)));
+Ecart_type = UN * diag(std(std(A)));
+ec  = 1./Ecart_type;
+Acr  = (A - Me).*ec;
 end
