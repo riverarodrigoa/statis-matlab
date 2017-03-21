@@ -120,9 +120,6 @@ for i=1:n
     text(Co(i,1), Co(i,2),varnames(i));
 end
 
-disp('norme test');
-disp(norme(W(:,:,1)));
-
 end
 
 function [r] = prod_hs(A,B,D)
