@@ -42,5 +42,4 @@ grid on;
 xlabel(sprintf('Axe 1 (Inertie: %.2f %%)',V_pour(1)));
 ylabel(sprintf('Axe 2 (Inertie: %.2f %%)',V_pour(2)));
 title('Corr?lations des variables')
-
 end

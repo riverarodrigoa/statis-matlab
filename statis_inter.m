@@ -124,7 +124,7 @@ disp(RV)
 %-------------------------------------------------------------------------------
 % Image euclidienne des objets
 %-------------------------------------------------------------------------------
-SS = S*Delta;
+SS = S*Delta*Delta;
 
 [Cp,VaP,VeP] = ACP(SS);
 
@@ -169,7 +169,7 @@ function [XU, VAPU, VEPU] = ACP(X)
 % Calcul ACP
 %--------------------------------
 % Recherche des valeurs et vecteurs propres
-[VEPU, VAPU] = eig(X);    
+[VEPU, VAPU] = eig(X); 
 VAPU         = diag(VAPU);        
 %
 % Ordonnancement des valeurs et vecteurs propres

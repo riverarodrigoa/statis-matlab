@@ -1,6 +1,6 @@
 %% STATIS DB 1
 clear; close all; clc;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Load Data 1
 path_data = '~/Documents/UNIVERSITE_PARIS_SACLAY/M2_TRIED/Projet_long/Data/'; 
 filename=[path_data,'nnotes_FAT.xls'];
@@ -65,6 +65,7 @@ D =1/size(X,1) * eye(size(X,1));
 % varnames{8}=sprintf('tete');
 % varnames{9}=sprintf('pelvis');
 % for t=1:size(X,3) varetude{t} = sprintf('Annee %d', t); end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [Co,SS,RV,W,VaP,VeP,Xcr] = statis_inter (X);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

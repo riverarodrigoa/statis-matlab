@@ -118,7 +118,6 @@ for m=1:j
         end
     end
 end
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Plot des correlations des variables
 [nb_inds, nb_vars, nb_etudes] = size(X);
@@ -134,7 +133,6 @@ xlabel(sprintf('Axe 1 (Inertie: %.2f %%)',V_pour(1)));
 ylabel(sprintf('Axe 2 (Inertie: %.2f %%)',V_pour(2)));
 title('Corr?lations des variables')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 end
 
 function [XU, VAPU, VEPU] = ACP(X)
@@ -179,9 +177,9 @@ function [XU, VAPU, VEPU] = ACP3(X)
 VAPU         = diag(VAPU);        
 %
 % Ordonnancement des valeurs et vecteurs propres
-[VAPU,s] = sort(VAPU);
-VAPU     = VAPU(flipud(s)); 
-VEPU     = VEPU(:,flipud(s)); 
+[VAPU,s] = sort(VAPU, 'descend');
+%VAPU     = VAPU(s); 
+VEPU     = VEPU(:,s);
 %
 % Nouvelles Coordonn?es (Composantes principales)
 XU = (X * VEPU) * diag(1./sqrt(VAPU)); 
@@ -203,6 +201,7 @@ VEPU     = VEPU(:,s);
 XU = VEPU * diag(sqrt(VAPU));  
 end
 
+
 function [Ac] = centrer(A,mean_A,std_A,r)
 %--------------------------------
 % Centrage des donn?es
@@ -216,4 +215,3 @@ Me = UN * mean_A;
         Ac  = (A - Me);
     end
 end
-
