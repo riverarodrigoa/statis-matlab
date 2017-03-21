@@ -128,11 +128,14 @@ disp('norme Wcomp');
 disp(norme(Wcomp));
 
 disp('produit Delta * normes(Wt)')
-Pi = 1/4;
-disp(Pi*norme(W(:,:,1)));
-disp(Pi*norme(W(:,:,2)));
-disp(Pi*norme(W(:,:,3)));
-disp(Pi*norme(W(:,:,4)));
+T = size(X,3);
+
+disp('Somme Pi_t*norme(Wt)');
+sum_Pi_t_normes = 0;
+for t=1:T
+    sum_Pi_t_normes = sum_Pi_t_normes + norme(W(:,:,t));
+end;
+disp(sum_Pi_t_normes);
 
 
 
@@ -172,7 +175,7 @@ function [XU,VAPU, VEPU] = ACP2(X,D)
 % Calcul ACP
 %--------------------------------
 % Recherche des valeurs et vecteurs propres
-[VEPU, VAPU] = eig(X*((1/3)*eye(size(X,2)))*X'*D);
+[VEPU, VAPU] = eig(X*((1/size(X,2))*eye(size(X,2)))*X'*D);
 VAPU         = diag(VAPU); 
 %VAPU=sign(VAPU(1))*VAPU;
 VEPU=sign(VEPU(1,1)).*VEPU;
