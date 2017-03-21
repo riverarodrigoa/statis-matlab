@@ -129,10 +129,10 @@ disp(norme(Wcomp));
 
 disp('produit Delta * normes(Wt)')
 Pi = 1/4;
-disp(sqrt(Pi)*norme(W(:,:,1)));
-disp(sqrt(Pi)*norme(W(:,:,2)));
-disp(sqrt(Pi)*norme(W(:,:,3)));
-disp(sqrt(Pi)*norme(W(:,:,4)));
+disp(Pi*norme(W(:,:,1)));
+disp(Pi*norme(W(:,:,2)));
+disp(Pi*norme(W(:,:,3)));
+disp(Pi*norme(W(:,:,4)));
 
 
 
