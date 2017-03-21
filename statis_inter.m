@@ -1,4 +1,4 @@
-function [Co,S,SS,RV,W,Wn,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,norm,D,varnames)
+function [Co,S,SS,RV,W,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,norm,D,varnames)
 %% Fonction de calcul de de l'interstructure pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
@@ -61,42 +61,30 @@ end
 %-------------------------------------------------------------------------------
 % Centrage des tableaux
 for i = 1:n
-    Xc(:,:,i) = centrer(X(:,:,i),mean(mean(X(:,:,i))), std(std(X(:,:,i))));
+    Xc(:,:,i) = centrer(X(:,:,i),mean(X(:,:,i)), std(X(:,:,i)));
 end
 
 for i = 1:n
-     W(:,:,i) = Xc(:,:,i)*M*Xc(:,:,i)';
-     Wn(:,:,i) = W(:,:,i)/sqrt(norme(W(:,:,i)));
+    if ~norm
+       W(:,:,i) = Xc(:,:,i)*M*Xc(:,:,i)';
+    else
+        W(:,:,i) = Xc(:,:,i)*M*Xc(:,:,i)';
+        W(:,:,i) = W(:,:,i)./norme(W(:,:,i));
+    end     
 end
 %-------------------------------------------------------------------------------
 % Calcul de la matrice des produits scalaires S
 %-------------------------------------------------------------------------------
 if nargin > 5
-    if ~norm
-        for i=1:n
-            for j=1:n
-                S(i,j)=prod_hs(W(:,:,i),W(:,:,j),D);
-            end
-        end
-    else
-        for i=1:n
-            for j=1:n
-                S(i,j)=(prod_hs(W(:,:,i),W(:,:,j),D))/(norme(W(:,:,i),D)*(norme(W(:,:,j),D)));
-            end
+    for i=1:n
+        for j=1:n
+            S(i,j)=prod_hs(W(:,:,i),W(:,:,j),D);
         end
     end
 else 
-    if ~norm
-        for i=1:n
-            for j=1:n
-                S(i,j)=prod_hs(W(:,:,i),W(:,:,j));
-            end
-        end
-    else
-        for i=1:n
-            for j=1:n
-                S(i,j)=(prod_hs(W(:,:,i),W(:,:,j)))/(norme(W(:,:,i))*(norme(W(:,:,j))));
-            end
+    for i=1:n
+        for j=1:n
+            S(i,j)=prod_hs(W(:,:,i),W(:,:,j));
         end
     end
 end
@@ -105,7 +93,7 @@ end
 %-------------------------------------------------------------------------------
 for i=1:n
     for j=1:n
-        RV(i,j) = S(i,j)/(sqrt(S(i,i))*(sqrt(S(j,j))));
+        RV(i,j) = S(i,j)/(sqrt(S(i,i))*sqrt(S(j,j)));
     end
 end
 %-------------------------------------------------------------------------------
@@ -115,13 +103,14 @@ SS = S*Delta;
 
 [Cp,VaP,VeP] = ACP(SS);
 % Par le th?oreme de Frobenius on garde seulement les 2 premiers axes
-Co = Cp(:,1:2); 
+Co = Cp(:,1:2);
 
 % Pourcentage d'inertie
-p= (VaP*100)/sum(VaP)
+p= (VaP*100)/sum(VaP);
 
 figure;
 scatter(Co(:,1),Co(:,2)); grid on; 
+axis([0 (max(Co(:,1))*1.3) (min(Co(:,2))*2) (max(Co(:,2))*2)])
 xlabel(sprintf('Axe 1 (Inertie: %.2f %%)',p(1)));
 ylabel(sprintf('Axe 2 (Inertie: %.2f %%)',p(2)));
 title('Image euclidienne des objets')
@@ -130,6 +119,9 @@ title('Image euclidienne des objets')
 for i=1:n
     text(Co(i,1), Co(i,2),varnames(i));
 end
+
+disp('norme test');
+disp(norme(W(:,:,1)));
 
 end
 
@@ -141,14 +133,14 @@ if nargin < 3
     n= size(A,2);
     D = 1/n * eye(n);
 end
-r = trace(D*A*D*B);
+r = trace(A*D*B*D);
 end
 
 function [An]= norme(A,D)
 %--------------------------------
 % Definition de norme
 %--------------------------------
-if nargin < 3
+if nargin < 2
     n= size(A,2);
     D =1/n * eye(n);
 end
@@ -161,16 +153,18 @@ function [XU,VAPU, VEPU] = ACP(X)
 % Calcul ACP
 %--------------------------------
 % Recherche des valeurs et vecteurs propres
-[VEPU, VAPU] = eig(X);    
+[VEPU, VAPU] = eig(X); 
 VAPU         = diag(VAPU);        
 %
 % Ordonnancement des valeurs et vecteurs propres
 [VAPU,s] = sort(VAPU, 'descend');
-% VAPU     = VAPU(flipud(s)); 
-VEPU     = VEPU(:,s); 
+%VAPU     = VAPU(s); 
+VEPU     = VEPU(:,s);
+VEPU=sign(VEPU(1,1)).*VEPU;
 %
 % Nouvelles Coordonn?es (Composantes principales)
-XU = VEPU * diag(sqrt(VAPU)); 
+XU = VEPU * diag(sqrt(VAPU));
+%XU=sign(XU(1,1)).*XU;
 end
 
 function [Ac] = centrer(A,mean_A,std_A)
@@ -178,7 +172,8 @@ function [Ac] = centrer(A,mean_A,std_A)
 % Centrage des donn?es
 %--------------------------------
 UN = ones(size(A));
-Me = UN * mean_A;
+Me = UN * diag(mean_A);
 Ecart_type = UN * diag(std_A);
-Ac  = (A - Me);
+ec  = 1./Ecart_type;
+Ac  = (A - Me).*ec;
 end
