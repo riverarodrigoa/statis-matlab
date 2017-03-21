@@ -1,150 +1,123 @@
-function [Co,S,RV,W,VaP,VeP,Xcr] = statis_inter (X,M,D,Delta,norm,etunames)
+function [Co,S,SS,RV,W,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,norm,D,varnames)
 %% Fonction de calcul de de l'interstructure pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
-% X = Tableaux avec les t ?tudes
-%
-% PARAMETRES OPTIONELS
+% X = Tableaux avec les t études
 % M = Metrique (usuelment matrice identit?)
 % Delta = Matrice diagonal avec les poids
 % Sup = Matrice avec les tableaux supplementaires
 % norm = Option si on veut faire l'analyse en prendre en compre la norme
+%
+% PARAMETRES OPTIONELS
 % varnames = variable de type string qui a le nom des variables
 % D = M?trique des poids, permettant le calcul des distances entre variables,
 %     usuelment 1/n * I (I est la matrice identit?)
-% r = Centrage et/ou reduction (1: Centrage et reduction, 0:Centrage)
 %
 % Output Variables
 % Co = Matrice avec les composantes principales
-% SS = Matrice des produits scalaire entre les tableaux afect? par le poids Delta
+% S = Matrice des produits scalaire entre les tableaux
+% SS = Matrice des produits scalaire entre les tableaux afect? par le poids
+%      Delta
 % RV = Matrice avec les coefficients RV
 % W = Matrice avec les objets des t etudes
 % Wn = Matrice avec les objets des t etudes normes
 % VaP = Valeurs propres du matrice SS
 % VeP = Vecteurs propres du matrice SS
-% Xcr = Tableaux des etudes centrees et reduites
+% Xc = Donn?es centr?es et reduites
 %
 % Use:
-% [Co,SS,RV,W,VaP,VeP,Xcr] = statis_inter (X,M,D,Delta,norm,etunames)
+% [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X,M,Delta,Sup,norm,D,varnames)
 %
-% Author: Rodrigo Andres Rivera Martinez
-% Corrections: Larbi Mouchou, Mounir Bendali-Braham, Nafise Gouard
+% Authors: Larbi Mouchou, Rodrigo Andres Rivera Martinez, Mounir Bendali-Braham, Nafise Gouard
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-disp('***************************************');
-disp('******** STATIS INTERSTRUCTURE ********');
-disp('***************************************');
-%% Definition des objets repr?sentatifs
-% Verification des matrices et definition des parametres par default
-if ~exist('X','var') || isempty(X)
-    error('[STATIS] You must provide a matrix X');
-else
-    disp('----------------------------');
-    disp('-- Parametres par default --');
-    disp('----------------------------');
-    disp('');
-    [L,C,n] = size(X);
-    if ~exist('M','var') || isempty(M)
-        M = eye(C);
-        fprintf('[DEFAULT] M = I [%d x %d]\n',size(M));
-    end
-    if ~exist('D','var') || isempty(D)
+%% D?finition des objets repr?sentatifs
+% Verification des matrices
+if(nargin<5)
+    error('SYNTAXE ERROR: statis_interstructure (X,M,Delta,Sup,norm)');
+end
 
-        D = (1/L).* eye(L);
-        fprintf('[DEFAULT] D = 1/%d *I [%d x %d]\n',L,size(D));
+[L,C,n] = size(X);
+[L3,C3]=size(Sup);
+
+if L~=L3
+    error('ERROR: Nb d''individus doit etre egal dans les matrices X et Sup');
+end
+if C ~= C3
+    error('ERROR: Nb de variables doit etre egal dans les matrices X et Sup');
+end
+
+if nargin<7
+    for i=1:n
+        varnames{i} = sprintf('Objet %d',i);
     end
-    if ~exist('Delta','var') || isempty(Delta)
-        Delta = (1/n).*eye(n);
-        fprintf('[DEFAULT] Delta = 1/%d *I [%d x %d]\n',n,size(Delta));
-    end
-    if ~exist('norm','var') || isempty(norm) % norm? par default
-        norm = 1;
-        disp('[DEFAULT] Norme');
-    else
-        if norm
-            disp('[USER] Norme');
-        else
-            disp('[USER] Non norme');
-        end
-    end
-    if ~exist('etunames','var') || isempty(etunames)
-        for i=1:n
-            etunames{i} = sprintf('Objet %d',i);
-        end
-        fprintf('[DEFAULT] etunames [%d x %d]\n',size(etunames));
-    else
-        if size(etunames,2) < n || size(etunames,2) > n
-        error('ERROR: <etunames> doit etre de la meme taille que le nb d''?tudes');
-        end
+else 
+    if size(varnames,2) < n || size(varnames,2) > n
+        error('ERROR: <varnames> doit etre de la meme taille que le nb d''?tudes');
     end
 end
-disp('***************************************');
 %-------------------------------------------------------------------------------
 % Definition des objets
 %-------------------------------------------------------------------------------
-% Centrage/reduction des tableaux
-Xcr = zeros(size(X));
+% Centrage des tableaux
 for i = 1:n
-    Xcr(:,:,i) = centrer(X(:,:,i));
+    Xc(:,:,i) = centrer(X(:,:,i),mean(X(:,:,i)), std(X(:,:,i)));
 end
 
-% Calcul des objets
-W = zeros(L,L,n);
-if norm
-    for i = 1:n
-        W(:,:,i) = Xcr(:,:,i)*M*Xcr(:,:,i)';
+for i = 1:n
+    if ~norm
+       W(:,:,i) = Xc(:,:,i)*M*Xc(:,:,i)';
+    else
+        W(:,:,i) = Xc(:,:,i)*M*Xc(:,:,i)';
         W(:,:,i) = W(:,:,i)./norme(W(:,:,i));
-    end
-else
-    for i = 1:n
-        W(:,:,i) = Xcr(:,:,i)*M*Xcr(:,:,i)';
-    end
+    end     
 end
 %-------------------------------------------------------------------------------
 % Calcul de la matrice des produits scalaires S
 %-------------------------------------------------------------------------------
-S = zeros(n);
-for i=1:n
-    for j=1:n
-        S(i,j)=prod_hs(W(:,:,i),W(:,:,j),D);
+if nargin > 5
+    for i=1:n
+        for j=1:n
+            S(i,j)=prod_hs(W(:,:,i),W(:,:,j),D);
+        end
+    end
+else 
+    for i=1:n
+        for j=1:n
+            S(i,j)=prod_hs(W(:,:,i),W(:,:,j));
+        end
     end
 end
-S=S./S(1,1);
 %-------------------------------------------------------------------------------
 % Calcul de coefficient RV
 %-------------------------------------------------------------------------------
-RV = zeros(n);
-    for i=1:n
-        for j=1:n
-            RV(i,j) = S(i,j)/(sqrt(S(i,i))*(sqrt(S(j,j))));
-        end
+for i=1:n
+    for j=1:n
+        RV(i,j) = S(i,j)/(sqrt(S(i,i))*sqrt(S(j,j)));
     end
-disp('RV');
-disp(RV)
+end
 %-------------------------------------------------------------------------------
 % Image euclidienne des objets
 %-------------------------------------------------------------------------------
 SS = Delta'*S*Delta;
 
 [Cp,VaP,VeP] = ACP(SS);
-
 % Par le th?oreme de Frobenius on garde seulement les 2 premiers axes
 Co = Cp(:,1:2);
-% Pourcentage d'inertie
-p = (VaP*100)/sum(VaP);
 
-% Plot de l'image eucidenne
-disp('Plot de l''image euclidienne');
+% Pourcentage d'inertie
+p= (VaP*100)/sum(VaP);
 
 figure;
-scatter(Co(:,1),Co(:,2)); grid on;
-if norm; xlim([0,1]); ylim([-1,1]); else xlim([0,Inf]);  end
+scatter(Co(:,1),Co(:,2)); grid on; 
+axis([0 (max(Co(:,1))*1.3) (min(Co(:,2))*2) (max(Co(:,2))*2)])
 xlabel(sprintf('Axe 1 (Inertie: %.2f %%)',p(1)));
 ylabel(sprintf('Axe 2 (Inertie: %.2f %%)',p(2)));
-title('Image euclidienne des objets','FontSize',16);
+title('Image euclidienne des objets')
+
 
 for i=1:n
-    text(Co(i,1), Co(i,2),etunames(i));
+    text(Co(i,1), Co(i,2),varnames(i));
 end
 
 end
@@ -153,18 +126,26 @@ function [r] = prod_hs(A,B,D)
 %--------------------------------
 % Definition de produit scalaire
 %--------------------------------
-r = trace(D*A*D*B);
+if nargin < 3
+    n= size(A,2);
+    D = 1/n * eye(n);
+end
+r = trace(A*D*B*D);
 end
 
-function [An]= norme(A)
+function [An]= norme(A,D)
 %--------------------------------
 % Definition de norme
 %--------------------------------
-VaP = eig(A);
-An = sqrt(sum(VaP.^2));
+if nargin < 2
+    n= size(A,2);
+    D =1/n * eye(n);
 end
 
-function [XU, VAPU, VEPU] = ACP(X)
+An= sqrt(prod_hs(A,A,D));
+end
+
+function [XU,VAPU, VEPU] = ACP(X)
 %--------------------------------
 % Calcul ACP
 %--------------------------------
@@ -173,25 +154,23 @@ function [XU, VAPU, VEPU] = ACP(X)
 VAPU         = diag(VAPU);        
 %
 % Ordonnancement des valeurs et vecteurs propres
-[VAPU,s] = sort(VAPU, 'descend'); 
-VEPU     = VEPU(:,s); 
+[VAPU,s] = sort(VAPU, 'descend');
+%VAPU     = VAPU(s); 
+VEPU     = VEPU(:,s);
+VEPU=sign(VEPU(1,1)).*VEPU;
 %
 % Nouvelles Coordonn?es (Composantes principales)
-XU = VEPU * diag(sqrt(VAPU)); 
-XU(:,1) = sign(XU(1,1)).*(XU(:,1));
+XU = VEPU * diag(sqrt(VAPU));
+%XU=sign(XU(1,1)).*XU;
 end
 
-function [Acr] = centrer(A)
-%----------------------------------
-% Centrage et reduction des donnees
-%----------------------------------
-% [n,p]=size(A);
-% Ac= A - repmat(mean(A),n,1);
-% Acr=Ac.*repmat(std(A),n,1);
-
+function [Ac] = centrer(A,mean_A,std_A)
+%--------------------------------
+% Centrage des donn?es
+%--------------------------------
 UN = ones(size(A));
-Me = UN * diag(mean(mean(A)));
-Ecart_type = UN * diag(std(std(A)));
+Me = UN * diag(mean_A);
+Ecart_type = UN * diag(std_A);
 ec  = 1./Ecart_type;
-Acr  = (A - Me).*ec;
+Ac  = (A - Me).*ec;
 end
