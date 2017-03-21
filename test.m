@@ -28,7 +28,7 @@ varnames = {'Francais', 'Maths', 'Histoire'};
 [ Wcomp, alpha_t ] = compromis(W,S,Delta,VaP,VeP,norm);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 indnames = {'Eleve 1','Eleve 2','Eleve 3','Eleve 4','Eleve 5','Eleve 6'};
-[ B, B_val_c, Wd, VAPU, VEPU, corrvars, V_pour ] = statis_intra( Xc, M, W, Wcomp, alpha_t, indnames, varetude, varnames, norm);
+[ B, B_val_c, Wd, VAPU, VEPU, corrvars, V_pour ] = statis_intra( Xc, M, W, Wcomp, alpha_t, indnames, varetude, varnames, norm, Delta);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 trajectoires( X, W, D, VEPU, VAPU, V_pour, indnames)
 
