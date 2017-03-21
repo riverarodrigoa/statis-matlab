@@ -1,8 +1,8 @@
-function [ B, Wd, VAPU, VEPU, corrvars, V_pour ] = statis_intra( X, Wn, Wcomp, indnames, varetudes, varnames, p )
+function [ B, B_val_c, Wd, VAPU, VEPU, corrvars, V_pour ] = statis_intra( X, M, W, Wcomp, alpha_t, indnames, varetudes, varnames, norm )
 %% Fonction de calcul de l'intrastructure pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
-% X = Tableaux avec les t études
+% X = Tableaux avec les t Ã©tudes
 % Wcomp = Matrice avec le Compromis entre les objets W
 % indnames = variable de type string qui a le nom des individus
 % varetudes = variable de type string qui a les noms des variables
@@ -29,13 +29,6 @@ n = size(VAPU, 1);
 V_pour = (VAPU*100)/sum(VAPU); %Valeur propre_pourcentage (Inertie) ?
 p_tot = sum(V_pour(1:2)); %Pourcentage total ?
 j=2;
-if nargin > 6
-    while p > p_tot
-        j=j+1;
-        if j>n break; end;
-        p_tot = p_tot + V_pour(j);
-    end
-end
 
 B = XU(:,1:j); 
 
@@ -53,7 +46,7 @@ title('Image euclidienne compromis des individus')
 
 disp('V_pour');
 disp(V_pour);
-if nargin <2
+if nargin <5
     for i=1:L
         indnames{i} = sprintf('Individu %d',i);
     end
@@ -63,7 +56,7 @@ for i=1:L
     text(B(i,1), B(i,2),indnames(i));
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Corrélations des variables avec les axes du compromis
+%% CorrÃ©lations des variables avec les axes du compromis
 
 [nb_inds, nb_vars, nb_etudes] = size(X);
 nb_axes = 2;
@@ -71,7 +64,7 @@ nb_axes = 2;
 corrvars = ones(nb_etudes, nb_vars, nb_axes);
 [L,C,n] = size(X);
 for i = 1:n
-    Xc(:,:,i) = centrer_reduire(X(:,:,i),mean(mean(X(:,:,i))), std(std(X(:,:,i))));
+    Xc(:,:,i) = X(:,:,i);
 end
 
 for axe = 1:nb_axes
@@ -81,8 +74,7 @@ for axe = 1:nb_axes
         end;
     end;
 end;
-
-% Plot des corrélations des variables
+% Plot des corrÃ©lations des variables
 
 figure;
 hold on;
@@ -95,12 +87,54 @@ end;
 
 xlabel(sprintf('Axe 1 (Inertie: %.2f %%)',V_pour(1)));
 ylabel(sprintf('Axe 2 (Inertie: %.2f %%)',V_pour(2)));
-title('Corrélations des variables')
+title('CorrÃ©lations des variables')
 
 grid on;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Validation de l'image euclidienne compromis
+
+if norm
+    B_val=(sqrt(abs(alpha_t(1)/norme(Xc(:,:,1)*M*Xc(:,:,1)'))))*Xc(:,:,1);
+    for i=2:nb_etudes
+        B_val =[B_val (sqrt(abs(alpha_t(i)/norme(Xc(:,:,i)*M*Xc(:,:,i)'))))*Xc(:,:,i)];
+    end
+else
+    B_val=(sqrt(abs(alpha_t(1))))*Xc(:,:,1);
+    for i=2:nb_etudes
+        B_val =[B_val (sqrt(abs(alpha_t(i))))*Xc(:,:,i)];
+    end
+end
+
+%B_val = centrer(B_val,mean(B_val), std(B_val));
+% ACP du B_val
+[XU_v, Vp, VE] = ACP2(B_val,D);
+B_val_c = XU_v(:,1:2);
+
+Decision = isequal(B,B_val_c);
+if Decision
+    disp('[Validation test] Image euclidienne compromis correcte');
+else
+    disp('[Validation test] Image euclidienne compromis incorrecte');
+    disp('Image euclidienne');
+    disp(B);
+    disp('Validation');
+    disp(B_val_c);
+end
+
+
+disp('norme Wcomp');
+disp(norme(Wcomp));
+
+disp('produit Delta * normes(Wt)')
+Pi = 1/4;
+disp(sqrt(Pi)*norme(W(:,:,1)));
+disp(sqrt(Pi)*norme(W(:,:,2)));
+disp(sqrt(Pi)*norme(W(:,:,3)));
+disp(sqrt(Pi)*norme(W(:,:,4)));
+
+
 
 end
 function [XU,VAPU, VEPU] = ACP(X)
@@ -108,25 +142,69 @@ function [XU,VAPU, VEPU] = ACP(X)
 % Calcul ACP
 %--------------------------------
 % Recherche des valeurs et vecteurs propres
-[VEPU, VAPU] = eig(X);    
-VAPU         = diag(VAPU);        
+[VEPU, VAPU] = eig(X);
+VAPU         = diag(VAPU); 
+%VAPU=sign(VAPU(1))*VAPU;
 %
 % Ordonnancement des valeurs et vecteurs propres
-[VAPU,s] = sort(VAPU);
-VAPU     = VAPU(flipud(s)); 
-VEPU     = VEPU(:,flipud(s)); 
+[VAPU,s] = sort(VAPU, 'descend');
+%VAPU     = VAPU(s); 
+VEPU     = VEPU(:,s);
 %
-% Nouvelles Coordonnées (Composantes principales)
-XU = (X * VEPU) * diag(1./sqrt(VAPU)); 
+% Nouvelles CoordonnÃ©es (Composantes principales)
+XU = VEPU *diag(sqrt(VAPU)); 
 end
 
 
-function [Ac] = centrer_reduire(A,mean_A,std_A)
+function [Ac] = centrer(A,mean_A,std_A)
 %--------------------------------
 % Centrage des donn?es
 %--------------------------------
 UN = ones(size(A));
-Me = UN * mean_A;
+Me = UN * diag(mean_A);
 Ecart_type = UN * diag(std_A);
-Ac  = (A - Me)./Ecart_type;
+ec  = 1./Ecart_type;
+Ac  = (A - Me).*ec;
+end
+
+function [XU,VAPU, VEPU] = ACP2(X,D)
+%--------------------------------
+% Calcul ACP
+%--------------------------------
+% Recherche des valeurs et vecteurs propres
+[VEPU, VAPU] = eig(X*((1/3)*eye(size(X,2)))*X'*D);
+VAPU         = diag(VAPU); 
+%VAPU=sign(VAPU(1))*VAPU;
+VEPU=sign(VEPU(1,1)).*VEPU;
+%
+% Ordonnancement des valeurs et vecteurs propres
+[VAPU,s] = sort(VAPU, 'descend');
+%VAPU     = VAPU(s); 
+VEPU     = VEPU(:,s);
+%
+% Nouvelles CoordonnÃ©es (Composantes principales)
+XU = VEPU *diag(sqrt(VAPU)); 
+end
+
+function [An]= norme(A,D)
+%--------------------------------
+% Definition de norme
+%--------------------------------
+if nargin < 2
+    n= size(A,2);
+    D =1/n * eye(n);
+end
+
+An= sqrt(prod_hs(A,A,D));
+end
+
+function [r] = prod_hs(A,B,D)
+%--------------------------------
+% Definition de produit scalaire
+%--------------------------------
+if nargin < 3
+    n= size(A,2);
+    D = 1/n * eye(n);
+end
+r = trace(A*D*B*D);
 end
