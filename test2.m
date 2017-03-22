@@ -12,7 +12,6 @@ for i=1:30
 end
 
 M = eye(size(X,2));
-Sup = X(:,:,4);
 Delta = (1/size(X,3))*eye(size(X,3));
 norm=0;
 D =(1/size(X,1))*eye(size(X,1));
@@ -30,7 +29,7 @@ varnames{8}=sprintf('tete');
 varnames{9}=sprintf('pelvis');
 for t=1:size(X,3) varetude{t} = sprintf('Annee %d', t); end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-[Co,S,SS,RV,W,VaP,VeP,Xc] = statis_inter(X,M,Delta,Sup,norm,D, varetude);
+[Co,S,SS,RV,W,VaP,VeP,Xc] = statis_inter(X,M,Delta,norm,D, varetude);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [ Wcomp, alpha_t ] = compromis(W,S,Delta,VaP,VeP,norm);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

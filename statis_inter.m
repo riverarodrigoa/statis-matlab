@@ -1,11 +1,10 @@
-function [Co,S,SS,RV,W,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,norm,D,varnames)
+function [Co,S,SS,RV,W,VaP,VeP,Xc] = statis_inter (X,M,Delta,norm,D,varnames)
 %% Fonction de calcul de de l'interstructure pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
 % X = Tableaux avec les t études
 % M = Metrique (usuelment matrice identit?)
 % Delta = Matrice diagonal avec les poids
-% Sup = Matrice avec les tableaux supplementaires
 % norm = Option si on veut faire l'analyse en prendre en compre la norme
 %
 % PARAMETRES OPTIONELS
@@ -33,21 +32,13 @@ function [Co,S,SS,RV,W,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,norm,D,varnames
 
 %% D?finition des objets repr?sentatifs
 % Verification des matrices
-if(nargin<5)
-    error('SYNTAXE ERROR: statis_interstructure (X,M,Delta,Sup,norm)');
+if(nargin<4)
+    error('SYNTAXE ERROR: statis_interstructure (X,M,Delta,norm)');
 end
 
 [L,C,n] = size(X);
-[L3,C3]=size(Sup);
 
-if L~=L3
-    error('ERROR: Nb d''individus doit etre egal dans les matrices X et Sup');
-end
-if C ~= C3
-    error('ERROR: Nb de variables doit etre egal dans les matrices X et Sup');
-end
-
-if nargin<7
+if nargin<6
     for i=1:n
         varnames{i} = sprintf('Objet %d',i);
     end
@@ -59,7 +50,7 @@ end
 %-------------------------------------------------------------------------------
 % Definition des objets
 %-------------------------------------------------------------------------------
-% Centrage des tableaux
+% Centrage et réduction des tableaux
 for i = 1:n
     Xc(:,:,i) = centrer(X(:,:,i),mean(X(:,:,i)), std(X(:,:,i)));
 end
@@ -75,7 +66,7 @@ end
 %-------------------------------------------------------------------------------
 % Calcul de la matrice des produits scalaires S
 %-------------------------------------------------------------------------------
-if nargin > 5
+if nargin > 4
     for i=1:n
         for j=1:n
             S(i,j)=prod_hs(W(:,:,i),W(:,:,j),D);
@@ -99,7 +90,7 @@ end
 %-------------------------------------------------------------------------------
 % Image euclidienne des objets
 %-------------------------------------------------------------------------------
-SS = Delta'*S*Delta;
+SS = sqrt(Delta)'*S*sqrt(Delta);
 
 [Cp,VaP,VeP] = ACP(SS);
 % Par le th?oreme de Frobenius on garde seulement les 2 premiers axes

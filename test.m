@@ -16,14 +16,13 @@ for i = 1:3:11
 end
 
 M = eye(size(X,2));
-Sup = X(:,:,4);
 Delta = 1/4*eye(size(X,3));
 norm=1;
 D =(1/size(X,1))*eye(size(X,1));
 varetude = {'Année 1','Année 2','Année 3','Année 4'};
 varnames = {'Francais', 'Maths', 'Histoire'};
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-[Co,S,SS,RV,W,VaP,VeP,Xc] = statis_inter(X,M,Delta,Sup,norm,D, varetude);
+[Co,S,SS,RV,W,VaP,VeP,Xc] = statis_inter(X,M,Delta,norm,D, varetude);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [ Wcomp, alpha_t ] = compromis(W,S,Delta,VaP,VeP,norm);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

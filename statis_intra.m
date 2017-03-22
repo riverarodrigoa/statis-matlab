@@ -132,7 +132,7 @@ T = size(X,3);
 disp('Somme Pi_t*norme(Wt)');
 sum_Pi_t_normes = 0;
 for t=1:T
-    sum_Pi_t_normes = sum_Pi_t_normes + Delta(t,t)*norme(W(:,:,t));
+    sum_Pi_t_normes = sum_Pi_t_normes + sqrt(Delta(t,t))*norme(W(:,:,t));
 end;
 disp(sum_Pi_t_normes);
 
