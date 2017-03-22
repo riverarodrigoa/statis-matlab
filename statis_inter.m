@@ -99,7 +99,7 @@ end
 %-------------------------------------------------------------------------------
 % Image euclidienne des objets
 %-------------------------------------------------------------------------------
-SS = Delta'*S*Delta;
+SS = sqrt(Delta)'*S*sqrt(Delta);
 
 [Cp,VaP,VeP] = ACP(SS);
 % Par le th?oreme de Frobenius on garde seulement les 2 premiers axes
