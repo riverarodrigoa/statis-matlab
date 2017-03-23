@@ -56,14 +56,14 @@ gamma = VeP(:,1);
 Wcomp = 0;
 alpha_t = zeros(1,T);
 if ~norm
-    alpha_c = (pi_t'*sqrt(SS));
+    alpha_c = (sqrt(pi_t')*sqrt(SS));
     for i = 1:T
-        alpha_t(i) = (1./sqrt(VaP(1))*alpha_c*pi_t(i)*gamma(i));
+        alpha_t(i) = (1./sqrt(VaP(1))*alpha_c*sqrt(pi_t(i))*gamma(i));
       Wcomp = Wcomp + (alpha_t(i)*W(:,:,i));
     end
 else
     for i = 1:T
-        alpha_t(i) = (1/sqrt(VaP(1))*pi_t(i)*gamma(i));
+        alpha_t(i) = (1/sqrt(VaP(1))*sqrt(pi_t(i))*gamma(i));
         Wcomp = Wcomp + (alpha_t(i)*W(:,:,i));
     end
 end

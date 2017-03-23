@@ -1,11 +1,10 @@
-function [Co,S,SS,RV,W,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,norm,D,varnames)
+function [Co,S,SS,RV,W,VaP,VeP,Xc] = statis_inter (X,M,Delta,norm,D,etudenames)
 %% Fonction de calcul de de l'interstructure pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input variables
 % X = Tableaux avec les t études
 % M = Metrique (usuelment matrice identit?)
 % Delta = Matrice diagonal avec les poids
-% Sup = Matrice avec les tableaux supplementaires
 % norm = Option si on veut faire l'analyse en prendre en compre la norme
 %
 % PARAMETRES OPTIONELS
@@ -30,36 +29,92 @@ function [Co,S,SS,RV,W,VaP,VeP,Xc] = statis_inter (X,M,Delta,Sup,norm,D,varnames
 %
 % Authors: Larbi Mouchou, Rodrigo Andres Rivera Martinez, Mounir Bendali-Braham, Nafise Gouard
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Fonction de calcul de de l'interstructure pour la methode STATIS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Input variables
+% X = Tableaux avec les t etudes 
+%     [L,C,n] = size(X):
+%     L= nombre d'individus qui est identiques dans tous les études. 
+%     C= normbre des variables qui peut se changer d'un tableau à d'autre.
+%     n= nombre des études.
+% PARAMETRES OPTIONELS
+% M = Metrique (usuelment matrice identitique) 
+% Delta = Matrice diagonal avec les poids
+% Sup = Matrice avec les tableaux supplementaires
+% norm = Option si on veut faire l'analyse en prendre en compre la norme
+% varnames = variable de type string qui a le nom des variables
+% D = M?trique des poids, permettant le calcul des distances entre variables,
+%     usuelment 1/n * I (I est la matrice identit?)
+% r = Centrage et/ou reduction (1: Centrage et reduction, 0:Centrage)
+%
+% Output Variables
+% Co = Matrice avec les composantes principales
+% SS = Matrice des produits scalaire entre les tableaux afect? par le poids Delta
+% RV = Matrice avec les coefficients RV
+% W = Matrice avec les objets des t etudes
+% Wn = Matrice avec les objets des t etudes normes
+% VaP = Valeurs propres du matrice SS
+% VeP = Vecteurs propres du matrice SS
+% Xcr = Tableaux des etudes centrees et reduites
+%
+% Use:
+% [Co,SS,RV,W,VaP,VeP,Xcr] = statis_inter (X,M,D,Delta,norm,etunames)
+%
+% Authors: Larbi Mouchou, Rodrigo Andres Rivera Martinez, Nafise Gouard, Mounir Bendali-Braham
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% D?finition des objets repr?sentatifs
-% Verification des matrices
-if(nargin<5)
-    error('SYNTAXE ERROR: statis_interstructure (X,M,Delta,Sup,norm)');
-end
-
-[L,C,n] = size(X);
-[L3,C3]=size(Sup);
-
-if L~=L3
-    error('ERROR: Nb d''individus doit etre egal dans les matrices X et Sup');
-end
-if C ~= C3
-    error('ERROR: Nb de variables doit etre egal dans les matrices X et Sup');
-end
-
-if nargin<7
-    for i=1:n
-        varnames{i} = sprintf('Objet %d',i);
+disp('***************************************');
+disp('******** STATIS INTERSTRUCTURE ********');
+disp('***************************************');
+%% Definition des objets repr?sentatifs
+% Verification des matrices et definition des parametres par default
+if ~exist('X','var') || isempty(X)
+    error('[STATIS] You must provide a matrix X');
+else:
+    disp('----------------------------');
+    disp('-- Parametres par default --');
+    disp('----------------------------');
+    disp('');
+    [L,C,n] = size(X);
+    if ~exist('M','var') || isempty(M)
+        M = eye(C);
+        fprintf('[DEFAULT] M = I [%d x %d]\n',size(M));
     end
-else 
-    if size(varnames,2) < n || size(varnames,2) > n
-        error('ERROR: <varnames> doit etre de la meme taille que le nb d''?tudes');
+    if ~exist('D','var') || isempty(D)
+
+        D = (1/L).* eye(L);
+        fprintf('[DEFAULT] D = 1/%d *I [%d x %d]\n',L,size(D));
+    end
+    if ~exist('Delta','var') || isempty(Delta)
+        Delta = (1/n).*eye(n);
+        fprintf('[DEFAULT] Delta = 1/%d *I [%d x %d]\n',n,size(Delta));
+    end
+    if ~exist('norm','var') || isempty(norm) % norm? par default
+        norm = 1;
+        disp('[DEFAULT] Norme');
+    else
+        if norm
+            disp('[USER] Norme');
+        else
+            disp('[USER] Non norme');
+        end
+    end
+    if ~exist('etunames','var') || isempty(etudenames)
+        for i=1:n
+            etudenames{i} = sprintf('Objet %d',i);
+        end
+        fprintf('[DEFAULT] etunames [%d x %d]\n',size(etudenames));
+    else
+        if size(etudenames,2) < n || size(etudenames,2) > n
+        error('ERROR: <etudenames> doit etre de la meme taille que le nb d''etudes');
+        end
     end
 end
+disp('***************************************');
 %-------------------------------------------------------------------------------
 % Definition des objets
 %-------------------------------------------------------------------------------
-% Centrage des tableaux
+% Centrage et réduction des tableaux
 for i = 1:n
     Xc(:,:,i) = centrer(X(:,:,i),mean(X(:,:,i)), std(X(:,:,i)));
 end
@@ -75,7 +130,7 @@ end
 %-------------------------------------------------------------------------------
 % Calcul de la matrice des produits scalaires S
 %-------------------------------------------------------------------------------
-if nargin > 5
+if nargin > 4
     for i=1:n
         for j=1:n
             S(i,j)=prod_hs(W(:,:,i),W(:,:,j),D);
@@ -99,7 +154,7 @@ end
 %-------------------------------------------------------------------------------
 % Image euclidienne des objets
 %-------------------------------------------------------------------------------
-SS = Delta'*S*Delta;
+SS = sqrt(Delta)'*S*sqrt(Delta);
 
 [Cp,VaP,VeP] = ACP(SS);
 % Par le th?oreme de Frobenius on garde seulement les 2 premiers axes
@@ -117,7 +172,7 @@ title('Image euclidienne des objets')
 
 
 for i=1:n
-    text(Co(i,1), Co(i,2),varnames(i));
+    text(Co(i,1), Co(i,2),etudenames(i));
 end
 
 end
