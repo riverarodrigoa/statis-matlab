@@ -27,7 +27,8 @@ function [Co,S,SS,RV,W,VaP,VeP,Xc] = statis_inter (X,M,Delta,norm,D,etudenames)
 % Use:
 % [Co,S,SS,RV,W,Wn,VaP,VeP] = statis_inter (X,M,Delta,Sup,norm,D,varnames)
 %
-% Authors: Larbi Mouchou, Rodrigo Andres Rivera Martinez, Mounir Bendali-Braham, Nafise Gouard
+% Author: Rodrigo Andres Rivera Martinez
+% Corrections: Larbi Mouchou, Mounir Bendali-Braham, Nafise Gouard
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Fonction de calcul de de l'interstructure pour la methode STATIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

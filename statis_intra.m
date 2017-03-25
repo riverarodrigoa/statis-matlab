@@ -14,9 +14,10 @@ function [ B, B_val_c, Wd, VAPU, VEPU, corrvars, V_pour ] = statis_intra( X, M, 
 % B = Image euclidienne compromis des individus
 %
 % Use:
-% [ B ] = statis_intra( Wcomp, indnames,p )
+% [ B, B_val_c, Wd, VAPU, VEPU, corrvars, V_pour ] = statis_intra( X, M, W, Wcomp, alpha_t, indnames, varetudes, varnames, norm, Delta )
 %
-% Authors: Larbi Mouchou, Rodrigo Andres Rivera Martinez, Mounir Bendali-Braham, Nafise Gouard
+% Author: Rodrigo Andres Rivera Martinez
+% Corrections: Larbi Mouchou, Mounir Bendali-Braham, Nafise Gouard
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Definition de l'image euclidienne
